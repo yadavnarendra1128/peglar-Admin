@@ -1,0 +1,80 @@
+@font-face {
+    font-family: "Gilroy-100";
+    src: url("/fonts/gilory/Gilroy-UltraLight.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-UltraLight.woff") format("woff");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-200";
+    src: url("/fonts/gilory/Gilroy-Thin.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Thin.woff") format("woff");
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-300";
+    src: url("/fonts/gilory/Gilroy-Light.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Light.woff") format("woff");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-400";
+    src: url("/fonts/gilory/Gilroy-Regular.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Regular.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-500";
+    src: url("/fonts/gilory/Gilroy-Medium.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Medium.woff") format("woff");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-600";
+    src: url("/fonts/gilory/Gilroy-SemiBold.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-SemiBold.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-700";
+    src: url("/fonts/gilory/Gilroy-Bold.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Bold.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-800";
+    src: url("/fonts/gilory/Gilroy-ExtraBold.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-ExtraBold.woff") format("woff");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Gilroy-900";
+    src: url("/fonts/gilory/Gilroy-Heavy.woff2") format("woff2"),
+        url("/fonts/gilory/Gilroy-Heavy.woff") format("woff");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
