@@ -14,7 +14,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useRouter } from "next/navigation";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import showToast from "../../../../../api/lib/showToast";
-import { deleteProduct } from "../../../../../api/services/base.service";
+import { deleteProduct } from "@/api/services/product.service";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 
 // Corrected type definition to match the API response

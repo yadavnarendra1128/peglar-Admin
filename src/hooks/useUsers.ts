@@ -9,7 +9,7 @@ import {
   loginApi,
   type LoginDto,
   type LoginResponse,
-} from '../../api/services/base.service';
+} from '@/api/services/base.service';
 import { useEffect } from "react";
 
 export const useUsers = () => {

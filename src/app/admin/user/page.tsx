@@ -15,7 +15,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import showToast from "../../../../api/lib/showToast";
-import { BackendUser, deleteUser } from "../../../../api/services/base.service";
+import { BackendUser, deleteUser } from "@/api/services/base.service";
 
 type TableUser = {
   id: string;

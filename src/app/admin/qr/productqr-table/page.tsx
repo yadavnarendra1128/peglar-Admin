@@ -8,36 +8,27 @@ import {
 } from "material-react-table";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import { useQuery } from "@tanstack/react-query";
-import { getAllProductQr } from "api/services/base.service";
-// Define a new type for the API response data
-type QrCode = {
-  id: string;
-  product_id: string;
-  qr_value: string;
-  batch_no: string;
-  is_scanned: boolean;
-  is_redeemed: boolean;
-  scanned_by: string;
-  scanned_at: string;
-  redeemed_at: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { useProductsQr } from "@/hooks/useProductsQr";
+import { QrCode } from "@/types/qrCode";
+import UpdateRewardAmount from "@/components/Admin/qr/updateRewardAmount";
+import showToast from "@/api/lib/showToast";
+
 
 export default function CertificateTable() {
   // const [data, setData] = useState<QrCode[]>([]);
   // const [isLoading, setIsLoading] = useState(true);
-  const { data, isLoading, error } = useQuery<QrCode[]>({
-    queryFn: getAllProductQr,
-    // staleTime: 60 * 1000,
-    queryKey: ["prdouctqr"]
-  })
+  const { data, isLoading, error } = useProductsQr()
   const productQrData: QrCode[] = useMemo(() => {
     if (!data) return []
     return data
   }, [data])
 
+  const [defaultValue, setDefaultValue] = useState({
+    reward_amount: "",
+    batch_no: ""
+  })
+  const [isUpdate, setIsUpdate] = useState(false)
+  const [rowSelection, setRowSelection] = useState({})
 
   // Fetch the data from the API
   // useEffect(() => {
@@ -66,6 +57,11 @@ export default function CertificateTable() {
       { accessorKey: "qr_value", header: "QR Value", size: 150 },
       { accessorKey: "batch_no", header: "Batch No", size: 150 },
       {
+        accessorKey: "reward_amount",
+        header: "Reward",
+        size: 100
+      },
+      {
         accessorKey: "is_scanned",
         header: "Is Scanned",
         size: 100,
@@ -77,21 +73,21 @@ export default function CertificateTable() {
         size: 100,
         Cell: ({ cell }) => (cell.getValue() ? "Yes" : "No"),
       },
-      { accessorKey: "scanned_by", header: "Scanned By", size: 150 },
-      {
-        accessorKey: "scanned_at",
-        header: "Scanned At",
-        size: 200,
-        Cell: ({ cell }) =>
-          new Date(cell.getValue() as string).toLocaleString(),
-      },
-      {
-        accessorKey: "redeemed_at",
-        header: "Redeemed At",
-        size: 200,
-        Cell: ({ cell }) =>
-          new Date(cell.getValue() as string).toLocaleString(),
-      },
+      // { accessorKey: "scanned_by", header: "Scanned By", size: 150 },
+      // {
+      //   accessorKey: "scanned_at",
+      //   header: "Scanned At",
+      //   size: 200,
+      //   Cell: ({ cell }) =>
+      //     new Date(cell.getValue() as string).toLocaleString(),
+      // },
+      // {
+      //   accessorKey: "redeemed_at",
+      //   header: "Redeemed At",
+      //   size: 200,
+      //   Cell: ({ cell }) =>
+      //     new Date(cell.getValue() as string).toLocaleString(),
+      // },
       {
         accessorKey: "createdAt",
         header: "Created At",
@@ -99,6 +95,7 @@ export default function CertificateTable() {
         Cell: ({ cell }) =>
           new Date(cell.getValue() as string).toLocaleString(),
       },
+
       {
         id: "actions",
         header: "Actions",
@@ -174,14 +171,75 @@ export default function CertificateTable() {
     console.log("Download clicked for:", row.original);
     // Add download logic here
   };
+  useEffect(() => {
+    const d = Object.keys(rowSelection)
+    if (!d.length) {
+      setIsUpdate(false)
+    }
+    if (d.length) {
+      const id = parseInt(d[0])
+      const dvalue = (productQrData[id])
+      console.log("FFFFFFFFFFFFFFFFFFF", dvalue)
+      setDefaultValue({ reward_amount: dvalue.reward_amount, batch_no: dvalue.batch_no })
+    }
+  }, [rowSelection])
+  console.log("SSSSSS", Object.keys(rowSelection))
+
+
+
+  //update api call
+  const updateReward = async () => {
+    try {
+
+      const selectedProduct = productQrData.find(
+        (product) => product.batch_no === defaultValue.batch_no
+      );
+      // console.log(selectedProduct,productOptions,formData.productId)
+      if (!selectedProduct) {
+        alert("Please select a valid batch_no");
+        return;
+      }
+
+
+      // Optional: Commented out check for available QR codes; uncomment if desired // if (qrCountNum > selectedProduct.count) { // alert( //  `Cannot generate ${qrCountNum} QR codes. Only ${selectedProduct.count} available for this product.` // ); // return; // }
+      const apiPayload = {
+        batch_no: defaultValue.batch_no,
+        reward_amount: parseInt(defaultValue.reward_amount)
+      };
+      showToast(true, "reward updated successsdfullly")
+    } catch (e) {
+      showToast(false, error?.message)
+    }
+    // console.log("AAAAAAAAAAAAAAAAAAA",defaultValue)
+  }
+
+
+
+
+
+
+
 
   return (
     <DefaultLayout>
+      {<UpdateRewardAmount
+        productOptions={productQrData}
+        formData={defaultValue}
+        setFormData={setDefaultValue}
+        isOpen={isUpdate}
+        onCancel={() => {
+          setIsUpdate(false)
+          setRowSelection({})
+        }}
+        onConfirm={() => updateReward()}
+
+      />}
+
       <Breadcrumb pageName="QR Code Table" />
       <MaterialReactTable
         columns={[...columns]}
         data={productQrData}
-        state={{ isLoading }} // Pass the loading state to the table
+        state={{ isLoading, rowSelection }} // Pass the loading state to the table
         initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
         muiSkeletonProps={{
           animation: "wave",
@@ -192,7 +250,16 @@ export default function CertificateTable() {
             color: "#4F033D"
           }
         }}
+        enableRowSelection={true}
+        enableMultiRowSelection={false}
+        onRowSelectionChange={(updater) => {
+          setRowSelection(updater)
+          setIsUpdate(true)
+        }}
+
       />
+
     </DefaultLayout>
+
   );
 }

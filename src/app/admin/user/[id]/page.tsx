@@ -8,7 +8,6 @@ const Page = () => {
     <DefaultLayout>
       <div className="mx-auto w-full max-w-[970px]">
         <Breadcrumb pageName="Profile" />
-
         <ProfileBox />
       </div>
     </DefaultLayout>
