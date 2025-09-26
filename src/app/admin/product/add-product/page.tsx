@@ -297,6 +297,9 @@ export default function AddProductPage() {
             setUploading(false);
             event.target.value = "";
             sliderRef.current && sliderRef.current.slickGoTo(0);
+            if(errors.media){
+              setErrors((p)=>({...p,media:""}))
+            }
           }
         }
       };
@@ -436,7 +439,7 @@ export default function AddProductPage() {
                   type="text"
                   placeholder="Enter Finish"
                   value={formData.finish}
-                  onChange={(value) => handleChange("finish", Number(value))}
+                  onChange={(value) => handleChange("finish", (value))}
                   customClasses="mb-4.5"
                   error={errors.finish}
                 />
@@ -480,8 +483,12 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        <div className="relative">
-          <div className="flex flex-row items-center justify-start gap-6 my-4">
+        <div className="relative my-4 p-4 rounded-[10px] border border-stroke bg-white shadow-md">
+          <div className="text-lg">Product Media</div>
+          {errors.media && (
+            <p className="text-red-400  my-1 text-sm font-medium">{errors.media}</p>
+          )}
+          <div className="flex flex-row items-center justify-start mb-4 gap-6">
             {/* upload button */}
             <div className="flex">
               <button

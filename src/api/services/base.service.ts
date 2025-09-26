@@ -126,7 +126,7 @@ export const getAllProducts = async (): Promise<Product[]> => {
 
 export const deleteProduct = async (id: string) => {
   try {
-    await apiClient.delete(`/product/${id}`);
+    await apiClient.delete(`/product/deleteProduct/${id}`);
   } catch (e:any) {
     console.log(e);
     throw new Error(e.message);

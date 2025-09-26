@@ -31,9 +31,8 @@ export type ProductType = {
   name: string;
   model_no: string;
   base_price:number;
-  qr_count: number;
+  finish:string;
   description:string;
-  reward_amount: number;
   categoryId: string;
   subcategoryId: string;
   media:MediaType[]
@@ -126,7 +125,7 @@ export const getAllProducts = async (): Promise<Product[]> => {
 
 export const deleteProduct = async (id: string) => {
   try {
-    await apiClient.delete(`/product/${id}`);
+    await apiClient.delete(`/product/deleteProduct/${id}`);
   } catch (e:any) {
     console.log(e);
     throw new Error(e.message);

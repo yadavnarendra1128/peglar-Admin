@@ -104,19 +104,19 @@ export default function ProductTable() {
     () => [
       {
         header: "Sr. No.",
-        size: 50,
+        size: 70,
         Cell: ({ row }) => row.index + 1,
       },
       { accessorKey: "name", header: "Product Name", size: 220 },
       { accessorKey: "model_no", header: "Model No.", size: 140 },
       // { accessorKey: "offer_id", header: "Offer ID", size: 140 },
-      { accessorKey: "qr_count", header: "QR Count", size: 150 },
-      {
-        accessorKey: "reward_amount",
-        header: "Reward (₹)",
-        size: 150,
-        Cell: ({ cell }) => `₹${cell.getValue<number>() || 0}`,
-      },
+      // { accessorKey: "qr_count", header: "QR Count", size: 150 },
+      // {
+      //   accessorKey: "reward_amount",
+      //   header: "Reward (₹)",
+      //   size: 150,
+      //   Cell: ({ cell }) => `₹${cell.getValue<number>() || 0}`,
+      // },
       {
         accessorFn: (row) => row.Category?.name?.en || "-",
         header: "Category",
