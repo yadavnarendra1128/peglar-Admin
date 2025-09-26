@@ -16,7 +16,7 @@ import { sendPayment } from "../../../../../api/services/withdrawal.service";
 import showToast from "../../../../../api/lib/showToast";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
-import useWithdrawals from "@/hooks/useWithDrawal";
+import useWithdrawals from "@/hooks/useWithdrawal";
 
 type Withdrawal = {
   id: string;
