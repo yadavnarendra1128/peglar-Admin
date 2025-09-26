@@ -561,7 +561,7 @@ video {
 
 @layer components {
     .curlBtn {
-        @apply relative block w-[120px] h-11 mx-auto py-[1.18rem] bg-customPink border border-none border-gray-300 text-sm text-white text-center transition-all duration-250 ease-out;
+        @apply relative block w-[120px] h-9 mx-auto py-[1.18rem] bg-customPink border border-none border-gray-300 text-sm text-white text-center transition-all duration-250 ease-out;
     }
 
     .curlBtnPaper {
