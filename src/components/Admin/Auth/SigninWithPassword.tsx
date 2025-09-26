@@ -56,14 +56,14 @@ export default function SigninWithPassword({
     try {
       setIsPending(true)
       const res = await loginApi({ email, password });
-      const options: Cookies.CookieAttributes = {
-        secure: true,
-        sameSite: "none",
-      };
-      if (form.remember) {
-        options.expires = 7; // days
-      }
-      Cookies.set("token", res.token, options);
+      // const options: Cookies.CookieAttributes = {
+      //   secure: true,
+      //   sameSite: "none",
+      // };
+      // if (form.remember) {
+      //   options.expires = 7; // days
+      // }
+      // Cookies.set("token", res.token, options);
       setUser(res.data)
       showToast(true,'User found.')
       router.push("/admin");

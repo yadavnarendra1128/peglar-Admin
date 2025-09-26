@@ -16,12 +16,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  fetchCategory,
-  getSubcategories,
-  Subcategory,
-  updateSubcategory,
-} from "api/services/base.service";
+import { fetchCategory, getSubcategories, Subcategory, updateSubcategory } from "../../../../../api/services/base.service";
 
 // Define the Category interface locally
 interface Category {

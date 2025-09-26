@@ -1,9 +1,7 @@
-// hooks/useProducts.ts
-
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllProducts, Product } from "../../api/services/base.service";
+import { Product,getAllProducts } from "../../api/services/product.service";
 
 export const useProducts = () => {
   return useQuery<Product[], Error>({

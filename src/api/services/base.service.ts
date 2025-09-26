@@ -226,7 +226,7 @@ export const downloadQRExcel = async (downloadUrl: string) => {
 
 export const getSubcategories = async (): Promise<Subcategory[]> => {
   const res = await apiClient.get("/subcategories");
-  return res.data.data;
+  return res.data;
 };
 
 export const updateSubcategory = async (
@@ -291,15 +291,16 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
   }
 };
 
-export const getProfileApi = async (): Promise<User> => {
+export const getProfileApi = async (): Promise<LoginResponse> => {
   try {
     const res = await apiClient.get("/users/me");
-    return res.data.user;
+    return res.data;
   } catch (err: any) {
     console.log(err.response.data?.error);
     throw 'User not found.' 
   }
 };
+
 
 // ------ upload ---------------
 export const uploadFile = async (file:File, section:string):Promise<MediaType> => {

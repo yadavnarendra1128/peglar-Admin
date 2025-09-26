@@ -28,9 +28,7 @@ export default function GuruTable() {
   const { data, isLoading, isError } = useQuery<{ data: Category[] }, unknown, Category[]>({
     queryKey: ["categoriesData"],
     queryFn: fetchCategory,
-    select: (res) => res.data,
   });
-
   // Local state to manage the data displayed in the table for local updates/deletions.
   // We initialize it with the data from the API once it's loaded.
   const [localData, setLocalData] = useState<Category[]>([]);
