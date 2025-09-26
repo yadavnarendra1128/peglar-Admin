@@ -24,8 +24,7 @@ type errorDataType = {
   model_no: string;
   base_price: string;
   description: string;
-  qr_count: string;
-  reward_amount: string;
+  finish: string;
   categoryId: string;
   subcategoryId: string;
   media: string;
@@ -55,10 +54,9 @@ export default function AddProductPage() {
   const [formData, setFormData] = useState<ProductType>({
     name: "",
     model_no: "",
-    base_price:0,
     description:"",
-    qr_count: 1,
-    reward_amount: 1,
+    finish: "",
+    base_price:0,
     categoryId: "",
     subcategoryId: "",
     media:[]
@@ -77,8 +75,7 @@ export default function AddProductPage() {
   model_no: "",
   base_price: "",
   description: "",
-  qr_count: "",
-  reward_amount: "",
+  finish: "",
   categoryId: "",
   subcategoryId: "",
   media: "",
@@ -89,16 +86,15 @@ export default function AddProductPage() {
 
   const isValid = () => {
     const newErrors: errorDataType =  {
-  name: "",
-  model_no: "",
-  base_price: "",
-  description: "",
-  qr_count: "",
-  reward_amount: "",
-  categoryId: "",
-  subcategoryId: "",
-  media: "",
-};
+      name: "",
+      model_no: "",
+      base_price: "",
+      description: "",
+      finish: "",
+      categoryId: "",
+      subcategoryId: "",
+      media: "",
+    };
 
   if (!formData.name?.trim()) {
     newErrors.name = "Name is required";
@@ -124,25 +120,10 @@ export default function AddProductPage() {
     newErrors.description = "Description is required";
   }
 
-  // QR Count
-  if (!formData.qr_count) {
-    newErrors.qr_count = "QR count is required";
-  } else if (
-    isNaN(Number(formData.qr_count)) ||
-    Number(formData.qr_count) <= 0
-  ) {
-    newErrors.qr_count = "Enter a valid QR count";
-  }
-
-  // Reward amount
-  if (!formData.reward_amount) {
-    newErrors.reward_amount = "Reward amount is required";
-  } else if (
-    isNaN(Number(formData.reward_amount)) ||
-    Number(formData.reward_amount) < 0
-  ) {
-    newErrors.reward_amount = "Enter a valid reward amount";
-  }
+  // finish
+  if (!formData.finish?.trim()) {
+    newErrors.finish = "Finish is required";
+  } 
 
   // Category
   if (!formData.categoryId?.trim()) {
@@ -160,7 +141,6 @@ export default function AddProductPage() {
   }
 
     setErrors(newErrors);
-
     return Object.values(newErrors).every((v) => v === "");
   };
 
@@ -210,11 +190,9 @@ export default function AddProductPage() {
       setFormData({
         name: "",
         model_no: "",
-        base_price:0,
         description:"",
-        // offer_id: "",
-        qr_count: 1,
-        reward_amount: 1,
+        finish:"",
+        base_price:0,
         media: [],
         categoryId: "",
         subcategoryId: "",
@@ -244,8 +222,7 @@ export default function AddProductPage() {
           model_no: res.model_no,
           base_price:res.base_price,
           description: res.description,
-          qr_count: res.qr_count,
-          reward_amount: res.reqard_count || 1,
+          finish: res.finish || 1,
           categoryId: res.Category.id,
           subcategoryId: res.Subcategory.id,
           media: res.media
@@ -413,18 +390,7 @@ export default function AddProductPage() {
                   onChange={(value) => handleChange("name", value)}
                   required
                   customClasses="mb-4.5"
-                />
-
-                {/* Base price */}
-                <InputGroup
-                  label="Base Price"
-                  type="number"
-                  placeholder="Enter base price"
-                  value={formData.base_price}
-                  onChange={(value) =>
-                    handleChange("base_price", Number(value))
-                  }
-                  customClasses="mb-4.5"
+                  error={errors.name}
                 />
 
                 {/* Model Number */}
@@ -436,6 +402,7 @@ export default function AddProductPage() {
                   onChange={(value) => handleChange("model_no", value)}
                   required
                   customClasses="mb-4.5"
+                  error={errors.model_no}
                 />
 
                 {/* Offer ID */}
@@ -460,28 +427,31 @@ export default function AddProductPage() {
                   onChange={(value) => handleChange("description", value)}
                   required
                   customClasses="mb-4.5"
+                  error={errors.description}
                 />
 
                 {/* QR Count */}
                 <InputGroup
-                  label="QR Count"
-                  type="number"
-                  placeholder="Enter QR count"
-                  value={formData.qr_count}
-                  onChange={(value) => handleChange("qr_count", Number(value))}
+                  label="Finish"
+                  type="text"
+                  placeholder="Enter Finish"
+                  value={formData.finish}
+                  onChange={(value) => handleChange("finish", Number(value))}
                   customClasses="mb-4.5"
+                  error={errors.finish}
                 />
 
-                {/* Reward Amount */}
+                {/* Base price */}
                 <InputGroup
-                  label="Reward Amount"
+                  label="Base Price"
                   type="number"
-                  placeholder="Enter reward amount"
-                  value={formData.reward_amount}
+                  placeholder="Enter base price"
+                  value={formData.base_price}
                   onChange={(value) =>
-                    handleChange("reward_amount", Number(value))
+                    handleChange("base_price", Number(value))
                   }
                   customClasses="mb-4.5"
+                  error={errors.base_price}
                 />
 
                 {/* Category Dropdown */}
@@ -491,6 +461,7 @@ export default function AddProductPage() {
                   onSelectChange={(value) => handleChange("categoryId", value)}
                   selectedOption={selectedCatId}
                   setSelectedOption={setSelectedCatId}
+                  error={errors.categoryId}
                 />
 
                 {/* Subcategory Dropdown */}
@@ -502,6 +473,7 @@ export default function AddProductPage() {
                   }
                   selectedOption={selectedSubCatId}
                   setSelectedOption={setSelectedSubCatId}
+                  error={errors.subcategoryId}
                 />
               </div>
             </div>

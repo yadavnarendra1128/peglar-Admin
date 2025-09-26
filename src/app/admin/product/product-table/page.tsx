@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import showToast from "../../../../../api/lib/showToast";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
-import { deleteProduct, Product } from "../../../../../api/services/product.service";
+import { deleteProduct, Product } from "@/api/services/product.service";
 
 // type Product = {
 //   id: string;

@@ -10,7 +10,9 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // withCredentials: true,
 });
 
 export const basePath =
   process.env.NEXT_PUBLIC_API_BASE_PATH || "http://31.97.61.201";
+

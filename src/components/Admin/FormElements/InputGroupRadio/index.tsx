@@ -41,6 +41,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
           onChange(type === "number" ? +e.target.value : e.target.value)
         }
       />
+     
     </div>
   );
 };
