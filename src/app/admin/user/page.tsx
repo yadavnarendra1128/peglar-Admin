@@ -16,6 +16,9 @@ import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import showToast from "../../../../api/lib/showToast";
 import { BackendUser, deleteUser } from "@/api/services/base.service";
+import Notfication from "@/components/Admin/users/sendNotify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/api/lib/apiClient";
 
 type TableUser = {
   id: string;
@@ -27,23 +30,33 @@ type TableUser = {
   lifetime_earning: string;
   createdAt: string;
   profileImg?: string | null;
+  fcm?: string | null
 };
 
 export default function UserTable() {
+  const qc = useQueryClient()
   const router = useRouter();
+  const [rowSelection, setRowSelection] = useState({})
+  const [isUpdate, setIsUpdate] = useState(false)
   const { data, isLoading, isError, error } = useUsers();
-  const [users,setUsers]=useState<BackendUser[]>()
-  const {item,isOpen,openModal,closeModal}=useDeleteModal()
+  const [users, setUsers] = useState<BackendUser[]>()
+  const { item, isOpen, openModal, closeModal } = useDeleteModal()
+  const [formData, setFormData] = useState({
+    body: ""
+    , title: "",
+    imageUrl: ""
+  })
 
-  const onConfirmDelete=async()=>{
-    try{
+  const onConfirmDelete = async () => {
+    try {
       await deleteUser(item.id)
-      setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
-        if(!val)return []
+      setUsers((p) => {
+        const val = p ? p?.filter((e) => e.id.toString() !== item.id) : []
+        if (!val) return []
         else return val
       })
-      showToast(true,`User ${item.name} deleted successfully`)
-    }catch(err){
+      showToast(true, `User ${item.name} deleted successfully`)
+    } catch (err) {
       showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
     }
   }
@@ -53,7 +66,7 @@ export default function UserTable() {
     openModal(row.original as any)
   };
 
-  const handleView = (row: MRT_Row<TableUser>)=>{
+  const handleView = (row: MRT_Row<TableUser>) => {
     console.log("View clicked for:", row.original);
     router.push(`/admin/user/${row.original.id}`)
   }
@@ -141,25 +154,86 @@ export default function UserTable() {
   );
 
   const tableData: TableUser[] = useMemo(() => {
-      // console.log(users)
-      if (!users) return [];
-      return users.map((u) => ({
-        id: u.id,
-        name: u.name,
-        email: u.email ?? "",
-        phone: u.phone ?? "",
-        userType: u.userType,
-        isVerified: u.isVerified,
-        lifetime_earning: u.lifetime_earning ?? "0.00",
-        createdAt: u.createdAt,
-        profileImg: u.profileImg ?? null,
-      }));
-    }, [users]);
+    // console.log(users)
+    if (!users) return [];
+    return users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email ?? "",
+      phone: u.phone ?? "",
+      userType: u.userType,
+      isVerified: u.isVerified,
+      lifetime_earning: u.lifetime_earning ?? "0.00",
+      createdAt: u.createdAt,
+      profileImg: u.profileImg ?? null,
+      fcm: u.fcm ?? null
+    }));
+  }, [users]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setUsers(data)
-  },[data])
+  }, [data])
 
+  useEffect(() => {
+    if (!Object.keys(rowSelection).length)
+      return
+
+    // const fcmList=UserTable.filter((x,index:number)=>{
+    //   if(index===id[index]){
+    //     return x
+    //   }
+
+
+    console.log(rowSelection, Object.keys(rowSelection).length)
+
+  }, [rowSelection])
+
+  const sendMessage = async () => {
+    // if (!Object.keys(rowSelection).length)
+    //   throw new Error("please select user"+Object.keys(rowSelection));
+
+    if ((!formData.body) && (!formData.title)) {
+      throw new Error("please  enter information properly");
+    }
+    const token: string[] = []
+    const id = (Object.keys(rowSelection)).map(x => parseInt(x))
+    console.log(rowSelection)
+    for (let r = 0; r < tableData.length; r++) {
+      const dataIndex = id[r];
+      const fcmToken = tableData[dataIndex]?.fcm;
+      console.log("DDDD",fcmToken)
+      if (fcmToken) token.push(fcmToken);
+    }
+
+    const apiPayload = {
+      ...formData,
+      tokens: token,
+    };
+    console.log(apiPayload)
+
+    // const token =rowSelection
+
+
+    const res = await apiClient.post("pushNotification/sendMany", apiPayload)
+    showToast(true, "notification sent successfully")
+    console.log(res.data)
+  }
+
+
+  const notfiyMutation = useMutation({
+    mutationFn: () => sendMessage()
+    ,
+    onSuccess: (data, variables) => {
+      qc.invalidateQueries({ queryKey: ["notifcation"] });
+      setIsUpdate(false)
+      console.log(data)
+      showToast(true, "notification sent successfully")
+    },
+    onError: (error) => {
+      console.error('notifcation failed:', error)
+      showToast(false, error.message)
+    },
+  });
   return (
     <DefaultLayout>
       {/* Page header with breadcrumb navigation */}
@@ -206,7 +280,8 @@ export default function UserTable() {
               },
             })}
             state={{
-              isLoading: isLoading
+              isLoading: isLoading,
+              rowSelection
             }}
             muiSkeletonProps={{
               animation: "wave",
@@ -217,9 +292,40 @@ export default function UserTable() {
                 color: "#4F033D"
               }
             }}
+            enableMultiRowSelection={true}
+            // selectAllMode="all
+            enableRowSelection={true}
+            onRowSelectionChange={(updater) => {
+              setRowSelection(updater)
+            }}
+
+            renderTopToolbarCustomActions={() => {
+              return Object.keys(rowSelection).length ?
+                (<button
+                  className="bg-blue-600 text-white rounded-lg p-3 hover:scale-95 transition-all duration-700 "
+                  onClick={() => {
+                    //send notfication
+                    setIsUpdate(true)
+                  }}
+                >
+                  send notification
+                </button>) : null
+            }}
+            selectAllMode="all"
+
           />
         )}
-        <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='user' deletingField={item?.name ?? ''}/>
+      <Notfication
+        formData={formData}
+        setFormData={setFormData}
+        isOpen={isUpdate}
+        onCancel={() => {
+          setIsUpdate(false);
+          setRowSelection({});
+        }}
+        onConfirm={() => sendMessage()}
+      />
+      <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='user' deletingField={item?.name ?? ''} />
     </DefaultLayout>
   );
 }

@@ -185,14 +185,14 @@ export default function SubcategoriesPage() {
                 </IconButton>
               )}
 
-              <IconButton
+              {/* <IconButton
                 color="error"
                 size="small"
                 title="Hide"
                 onClick={() => handleHide(row)}
               >
                 <DeleteIcon fontSize="small" />
-              </IconButton>
+              </IconButton> */}
             </div>
           );
         },

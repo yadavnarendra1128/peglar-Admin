@@ -276,14 +276,14 @@ export default function GuruTable() {
                 </IconButton>
               )}
 
-              <IconButton
+              {/* <IconButton
                 color="error"
                 size="small"
                 title="Hide"
                 onClick={() => handleDelete(row)}
               >
                 <DeleteIcon fontSize="small" />
-              </IconButton>
+              </IconButton> */}
             </div>
           );
         },

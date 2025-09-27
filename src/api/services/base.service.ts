@@ -73,6 +73,7 @@ export type BackendUser = {
   lifetime_earning: string;
   createdAt: string;
   updatedAt: string;
+  fcm? :string;
 };
 
 // ============ User ============ 
@@ -100,7 +101,7 @@ export const getProfile = async ()=>{
 
 export const getUserById = async (id:string): Promise<User> => {
    try {
-     const res = await apiClient.get(`/users/${id}`);
+     const res = await apiClient.get(`/users/userId/${id}`);
      return res.data.user.data;
    } catch (e:any) {
      console.log(e);
@@ -283,6 +284,7 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
   try{
   const res = await apiClient.post("/users/login", payload);
   return res.data;
+  console.log(res)
   }catch(err: any){
     console.log(err.response.data?.error);
     throw (
@@ -293,7 +295,7 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
 
 export const getProfileApi = async (): Promise<User> => {
   try {
-    const res = await apiClient.get("/users/me");
+    const res = await apiClient.get("/users/me",{withCredentials:true});
     return res.data.user;
   } catch (err: any) {
     console.log(err.response.data?.error);

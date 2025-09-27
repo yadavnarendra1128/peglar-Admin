@@ -13,7 +13,7 @@ import { useSubcategories } from "@/hooks/useSubcategories";;
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProduct } from "../../../../../api/services/product.service";
 import showToast from "../../../../../api/lib/showToast";
-import { deleteFile, MediaType, ProductType, uploadFile } from "@/api/services/base.service";
+import { deleteFile, MediaType, ProductType, uploadFile } from "../../../../../api/services/base.service";
 
 import { basePath } from "@/api/lib/apiClient";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
@@ -26,6 +26,7 @@ type errorDataType = {
   description: string;
   finish: string;
   categoryId: string;
+  
   subcategoryId: string;
   media: string;
 };
