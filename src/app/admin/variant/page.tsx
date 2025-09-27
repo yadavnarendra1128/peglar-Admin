@@ -356,6 +356,7 @@ const VariantComponent = ()=>{
                     onChange={(value) => handleChange("size", value)}
                     required
                     customClasses="mb-4.5"
+                    error={errors.size}
                   />
 
                   <InputGroup
@@ -367,6 +368,7 @@ const VariantComponent = ()=>{
                       handleChange("finish", value)
                     }
                     customClasses="mb-4.5"
+                     error={errors.finish}
                   />
 
                   <InputGroup
@@ -377,6 +379,7 @@ const VariantComponent = ()=>{
                     onChange={(value) => handleChange("color", value)}
                     required
                     customClasses="mb-4.5"
+                     error={errors.color}
                   />
 
                   <InputGroup
@@ -387,6 +390,7 @@ const VariantComponent = ()=>{
                     onChange={(value) => handleChange("price", value)}
                     required
                     customClasses="mb-4.5"
+                     error={errors.price}
                   />
 
                   <InputGroup
@@ -398,6 +402,7 @@ const VariantComponent = ()=>{
                       handleChange("stock", Number(value))
                     }
                     customClasses="mb-4.5"
+                     error={errors.stock}
                   />
                 </div>
               

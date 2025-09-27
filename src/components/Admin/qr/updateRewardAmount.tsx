@@ -10,14 +10,18 @@ import { QrCode } from "@/types/qrCode";
 
 //   downloadUrl: string;
 // }
-type batch_nos = string[]
-function UpdateRewardAmountModal({ productOptions, formData, setFormData }: {
-  productOptions: QrCode[]
+type batch_nos = string[];
+function UpdateRewardAmountModal({
+  productOptions,
+  formData,
+  setFormData,
+}: {
+  productOptions: QrCode[];
   formData: {
-    batch_no: string
-    reward_amount: string
-  }
-  setFormData: any
+    batch_no: string;
+    reward_amount: string;
+  };
+  setFormData: any;
 }) {
   // const [data, setData] = useState<batch_nos>([])
   // //products list
@@ -28,23 +32,19 @@ function UpdateRewardAmountModal({ productOptions, formData, setFormData }: {
   //   setData(filteredBatchNo)
   // }, [productOptions])
 
-
   // const [Data, setData] = useState({
   //   batch_no: "", reward_amount: ""
   // }); // Dummy product data - ideally loaded from API or props
 
-
   // Handle form input changes generically
 
   const handleChange = (field: string, value: string | number) => {
-    console.log(field, value)
+    console.log(field, value);
     setFormData((prev: {}) => ({ ...prev, [field]: value }));
   }; // Form submission handler
 
-
   // // Optional: Commented out check for available QR codes; uncomment if desired // if (qrCountNum > selectedProduct.count) { // alert( //  `Cannot generate ${qrCountNum} QR codes. Only ${selectedProduct.count} available for this product.` // ); // return; // }
   return (
-
     <div className="mt-4 mb-5">
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-1">
         <div className="flex flex-col gap-9 col-span-2 md:col-span-1">
@@ -62,7 +62,6 @@ function UpdateRewardAmountModal({ productOptions, formData, setFormData }: {
                   customClasses="mb-4.5"
                   required // disabled={generateQRMutation.isLoading} // min={1}
                 />
-              
               </div>
 
               <InputGroup
@@ -87,8 +86,6 @@ function UpdateRewardAmountModal({ productOptions, formData, setFormData }: {
         >
           update
         </button> */}
-
-
       </div>
       {/* Success Message and Download Section
         {generatedQRData && (
@@ -120,7 +117,6 @@ function UpdateRewardAmountModal({ productOptions, formData, setFormData }: {
           </div>
         )} */}
     </div>
-
   );
 }
 import { useRef } from "react";
@@ -129,12 +125,12 @@ type Props = {
   isOpen: boolean;
   productOptions: QrCode[];
   formData: {
-    batch_no: string
-    reward_amount: string
-  }
+    batch_no: string;
+    reward_amount: string;
+  };
   onConfirm: () => void;
   onCancel: () => void;
-  setFormData: any
+  setFormData: any;
 };
 
 export default function UpdateRewardAmount({
@@ -143,7 +139,7 @@ export default function UpdateRewardAmount({
   formData,
   onConfirm,
   onCancel,
-  setFormData
+  setFormData,
 }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -163,12 +159,14 @@ export default function UpdateRewardAmount({
     };
   }, [isOpen]);
 
-
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/40 backdrop-blur-lg">
-      <div ref={modalRef} className="bg-white p-4 md:p-6 rounded-xl w-[70%] md:w-[90%] max-w-[400px] shadow-xl border border-primary">
+      <div
+        ref={modalRef}
+        className="bg-white p-4 md:p-6 rounded-xl w-[70%] md:w-[90%] max-w-[400px] shadow-xl border border-primary"
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-rosario tracking-wide font-semibold">
             Update Reward Amount
@@ -180,7 +178,11 @@ export default function UpdateRewardAmount({
             ✕
           </button>
         </div>
-        <UpdateRewardAmountModal productOptions={productOptions} formData={formData} setFormData={setFormData} />
+        <UpdateRewardAmountModal
+          productOptions={productOptions}
+          formData={formData}
+          setFormData={setFormData}
+        />
 
         <div className="flex justify-end gap-4">
           <button
@@ -194,7 +196,8 @@ export default function UpdateRewardAmount({
               onConfirm();
               onCancel();
             }}
-            className="px-4 py-2 bg-primary text-white hover:bg-hoverPrimary rounded-md">
+            className="px-4 py-2 bg-primary text-white hover:bg-hoverPrimary rounded-md"
+          >
             update
           </button>
         </div>

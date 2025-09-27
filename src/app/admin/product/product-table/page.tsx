@@ -13,9 +13,9 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useProducts } from "@/hooks/useProducts";
 import { useRouter } from "next/navigation";
 import { useDeleteModal } from "@/context/DeleteModalContext";
-import showToast from "../../../../../api/lib/showToast";
-import { deleteProduct } from "@/api/services/product.service";
+import showToast from "@/api/lib/showToast";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
+import { deleteProduct} from "@/api/services/product.service";
 
 // Corrected type definition to match the API response
 type Product = {
@@ -124,7 +124,7 @@ export default function ProductTable() {
     () => [
       {
         header: "Sr. No.",
-        size: 50,
+        size: 70,
         Cell: ({ row }) => row.index + 1,
       },
       {
@@ -154,16 +154,14 @@ export default function ProductTable() {
       },
       { accessorKey: "name", header: "Product Name", size: 220 },
       { accessorKey: "model_no", header: "Model No.", size: 140 },
-      { accessorKey: "offer_id", header: "Offer ID", size: 140 },
-      { accessorKey: "qr_count", header: "QR Count", size: 100 },
-      {
-        accessorKey: "reward_amount",
-        header: "Reward (₹)",
-        size: 120,
-        Cell: ({ cell }) => `₹${cell.getValue<number>() || 0}`,
-      },
-      { accessorKey: "categoryId", header: "Category", size: 180 },
-      { accessorKey: "subcategoryId", header: "Subcategory", size: 180 },
+      // { accessorKey: "offer_id", header: "Offer ID", size: 140 },
+      // { accessorKey: "qr_count", header: "QR Count", size: 150 },
+      // {
+      //   accessorKey: "reward_amount",
+      //   header: "Reward (₹)",
+      //   size: 150,
+      //   Cell: ({ cell }) => `₹${cell.getValue<number>() || 0}`,
+      // },
       {
         accessorKey: "createdAt",
         header: "Created At",

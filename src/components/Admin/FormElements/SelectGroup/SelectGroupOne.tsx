@@ -11,7 +11,8 @@ interface SelectGroupOneProps {
   title: string;
   onSelectChange: (value: string) => void; // Optional callback to pass the selected option to the parent
   selectedOption:string;
-  setSelectedOption:React.Dispatch<React.SetStateAction<string>>
+  setSelectedOption:React.Dispatch<React.SetStateAction<string>>;
+  error?:string
   }
 
 const SelectGroupOne: React.FC<SelectGroupOneProps> = ({
@@ -19,7 +20,7 @@ const SelectGroupOne: React.FC<SelectGroupOneProps> = ({
   title,
   onSelectChange,
   selectedOption,
-  setSelectedOption
+  setSelectedOption,error=''
 }) => {
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -74,6 +75,10 @@ const SelectGroupOne: React.FC<SelectGroupOneProps> = ({
           </svg>
         </span>
       </div>
+
+      {error && (
+        <p className="text-red-400  my-1 text-sm font-medium">{error}</p>
+      )}
     </div>
   );
 };

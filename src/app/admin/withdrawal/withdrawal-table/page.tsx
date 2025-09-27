@@ -6,16 +6,14 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
-import { useQuery } from "@tanstack/react-query";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import { CircularProgress, Typography } from "@mui/material";
-import { getAllWithdrawals } from "@/api/services/withdrawal.service";
 import useWithdrawals from "@/hooks/useWithdrawal";
 import { sendPayment } from "../../../../../api/services/withdrawal.service";
 import showToast from "../../../../../api/lib/showToast";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
+
 
 type Withdrawal = {
   id: string;
@@ -38,16 +36,15 @@ export default function WithdrawalTable() {
       //   if(!val)return []
       //   else return val
       // })
-      showToast(true, `User ${item.name} deleted successfully`)
+      showToast(true, `User ${item.name} deleted successfully`);
     } catch (err) {
       showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
     }
-  }
+  };
   const [mounted, setMounted] = useState(false);
-  // Fetch withdrawal data
-  const { data, isLoading, error } = useWithdrawals()
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false)
 
+   const { data, isLoading, error } = useWithdrawals();
+   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // Prevent hydration issues
   useEffect(() => setMounted(true), []);
@@ -169,11 +166,29 @@ export default function WithdrawalTable() {
               className="p-2 disabled:text-red-600 text-green-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
               disabled={isPaymentLoading}
               onClick={() => {
-                console.log(row.original)
-                payment(row.original)
+                console.log(row.original);
+                payment(row.original);
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-arrow-down-icon lucide-banknote-arrow-down"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5" /><path d="m16 19 3 3 3-3" /><path d="M18 12h.01" /><path d="M19 16v6" /><path d="M6 12h.01" /><circle cx="12" cy="12" r="2" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-banknote-arrow-down-icon lucide-banknote-arrow-down"
+              >
+                <path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5" />
+                <path d="m16 19 3 3 3-3" />
+                <path d="M18 12h.01" />
+                <path d="M19 16v6" />
+                <path d="M6 12h.01" />
+                <circle cx="12" cy="12" r="2" />
+              </svg>
             </button>
             <button
               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
@@ -219,33 +234,31 @@ export default function WithdrawalTable() {
   );
 
   // Normalize data structure
-  const [tableData, setTableData] = useState<Withdrawal[]>([])
+  const [tableData, setTableData] = useState<Withdrawal[]>([]);
 
   useEffect(() => {
-    console.log("AALLLL", data)
+    console.log("AALLLL", data);
     if (data?.length) {
-      setTableData(data)
+      setTableData(data);
     }
-  }, [data])
-
+  }, [data]);
 
   //payment api call
 
   const payment = async (payload: Withdrawal) => {
-    setIsPaymentLoading(true)
-    const { upiId, userId, amount } = payload
+    setIsPaymentLoading(true);
+    const { upiId, userId, amount } = payload;
     //api will call
-    console.log("BBBBBBBBBBBBBBBBBBB", upiId, userId, amount)
+    console.log("BBBBBBBBBBBBBBBBBBB", upiId, userId, amount);
     try {
-      await sendPayment(userId, upiId, parseInt(amount))
-      showToast(true, "Payment done successfully!!!")
+      await sendPayment(userId, upiId, parseInt(amount));
+      showToast(true, "Payment done successfully!!!");
     } catch (e: any) {
-      showToast(false, e.message)
+      showToast(false, e.message);
+    } finally {
+      setIsPaymentLoading(false);
     }
-    finally {
-      setIsPaymentLoading(false)
-    }
-  }
+  };
 
   // Early return for mounting state
   if (!mounted) return <div />;
@@ -383,21 +396,26 @@ export default function WithdrawalTable() {
               size: "small",
             }}
             state={{
-              isLoading: isLoading
+              isLoading: isLoading,
             }}
             muiSkeletonProps={{
               animation: "wave",
-
             }}
             muiCircularProgressProps={{
               style: {
-                color: "#4F033D"
-              }
+                color: "#4F033D",
+              },
             }}
           />
         </div>
       </div>
-      <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='withdrawals' deletingField={item?.upiId ?? ''} />
+      <DeleteModal
+        isOpen={isOpen}
+        onConfirm={onConfirmDelete}
+        onCancel={closeModal}
+        deletingQuery="withdrawals"
+        deletingField={item?.upiId ?? ""}
+      />
     </DefaultLayout>
   );
 }

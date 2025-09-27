@@ -1,13 +1,17 @@
 "use client";
-import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import InputGroup from "@/components/Admin/FormElements/InputGroup"; // Fixed typo here
+
 import React, { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+
 import {
-  downloadQRExcel,
+   downloadQRExcel,
   generateBulkQRCodes,
   GenerateBulkQRRequest,
 } from "@/api/services/qr.service";
+import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";;
+import InputGroup from "@/components/Admin/FormElements/InputGroup"; // Fixed typo here
+
+import { useMutation } from "@tanstack/react-query";
+
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/api/services/product.service";
@@ -21,24 +25,23 @@ interface GeneratedQRData {
 }
 
 export default function Page() {
-  //products list
-  const { data } = useProducts()
-
+  // State to hold generated QR code data after successful API call
+const { data } = useProducts();
   const [generatedQRData, setGeneratedQRData] =
     useState<GeneratedQRData | null>(null); // Form state with default values
 
   const [formData, setFormData] = useState({
-    productId: "", qrCount: "", reward_amount: ""
+    productId: "",
+    qrCount: "",
+    reward_amount: "",
   }); // Dummy product data - ideally loaded from API or props
 
-  const productOptions= useMemo(() => {
-    if (!data)
-       return []
-    return (data).map((product:Product)=>{
-      return({id:product.id,name:product.name})
-    })
-  }, [data])
-
+ const productOptions = useMemo(() => {
+   if (!data) return [];
+   return data.map((product: Product) => {
+     return { id: product.id, name: product.name };
+   });
+ }, [data]);
 
   const generateQRMutation = useMutation<
     GeneratedQRData,
@@ -88,8 +91,8 @@ export default function Page() {
 
     const apiPayload: GenerateBulkQRRequest = {
       product_id: formData.productId,
+    reward_amount: parseInt(formData.reward_amount),
       count: qrCountNum,
-      reward_amount: parseInt(formData.reward_amount)
     };
 
     generateQRMutation.mutate(apiPayload);
@@ -108,9 +111,8 @@ export default function Page() {
   const handleReset = () => {
     setFormData({
       productId: "",
-
       qrCount: "",
-      reward_amount: ""
+         reward_amount: ""
     });
 
     setGeneratedQRData(null);
@@ -151,10 +153,7 @@ export default function Page() {
                     </option>
 
                     {productOptions.map((product) => (
-                      <option
-                        key={product.id}
-                        value={product.id}
-                      >
+                      <option key={product.id} value={product.id}>
                         {product.name}
                         {/* You can show availability if needed */}
                         {/* (Available: {product.count}) */}
@@ -173,6 +172,16 @@ export default function Page() {
                   required 
                   
                 />
+                <InputGroup
+                  label="Reward Amount"
+                  type="number"
+                  placeholder="Enter reward amount"
+                  value={formData.reward_amount}
+                  onChange={(value) => handleChange("reward_amount", value)}
+                  customClasses="mb-4.5"
+                  required // disabled={generateQRMutation.isLoading} // min={1}
+                />
+
                 <InputGroup
                   label="Reward Amount"
                   type="number"

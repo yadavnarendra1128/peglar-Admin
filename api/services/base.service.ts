@@ -14,12 +14,22 @@ export type Product = {
   updatedAt: string;
 };
 
-export const getAllProducts = async (): Promise<Product[]> => {
-  const res = await apiClient.get<Product[]>("/product/getProducts");
-  return res.data;
+export type ProductType = {
+  name: string;
+  model_no: string;
+  base_price:number;
+  qr_count: number;
+  description:string;
+  reward_amount: number;
+  categoryId: string;
+  subcategoryId: string;
+  media:MediaType[]
 };
 
-// src/api/services/base.service.ts
+export type MediaType = {
+  url: string;
+  mediaType: "image" | "video";
+};
 
 // ============ Withdrawals ============
 export const getAllWithdrawals = async () => {
@@ -94,15 +104,41 @@ export const deleteUser = async (id:string)=>{
   }
 }
 
-// // ============ Product ============
-// export const deleteProduct = async (id: string) => {
-//   try {
-//     await apiClient.delete(`/product/${id}`);
-//   } catch (e:any) {
-//     console.log(e);
-//     throw new Error(e.message);
-//   }
-// };
+// ============ Product ============
+
+export const getAllProducts = async (): Promise<Product[]> => {
+  const res = await apiClient.get("/product/getProducts");
+  return res.data.data;
+};
+
+export const deleteProduct = async (id: string) => {
+  try {
+    await apiClient.delete(`/product/${id}`);
+  } catch (e:any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
+};
+
+export const getVariantsByProductId = async (id:string)=>{
+  try {
+    const res = await apiClient.get(`/variants/product/${id}`);
+    return res.data
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
+}
+
+export const createVariant = async (data:any)=>{
+   try {
+     const res = await apiClient.post(`/variants`,data);
+     return res.data;
+   } catch (e: any) {
+     console.log(e);
+     throw new Error(e.message);
+   }
+}
 
 // ============ Subcategories ============
 export type CreateSubcategoryDto = {

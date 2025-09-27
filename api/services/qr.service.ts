@@ -1,9 +1,9 @@
-import { apiClient, baseUrl } from "../lib/apiClient";
+import { apiClient, basePath} from "../lib/apiClient";
 // QR Code Generation Types and API
 export type GenerateBulkQRRequest = {
   product_id: string;
   count: number;
-  reward_amount:number
+  reward_amount: number;
 };
 
 export type GenerateBulkQRResponse = {
@@ -15,7 +15,7 @@ export type GenerateBulkQRResponse = {
 export const downloadQRExcel = async (downloadUrl: string) => {
   const response = await apiClient.get(downloadUrl, {
     responseType: "blob",
-    baseURL: baseUrl
+    baseURL: basePath,
   });
 
   // Try to get filename from Content-Disposition header
@@ -38,7 +38,6 @@ export const downloadQRExcel = async (downloadUrl: string) => {
   window.URL.revokeObjectURL(url);
 };
 
-
 export const generateBulkQRCodes = async (
   payload: GenerateBulkQRRequest
 ): Promise<GenerateBulkQRResponse> => {
@@ -52,4 +51,4 @@ export const generateBulkQRCodes = async (
 export const getAllProductQr = async () => {
   const res = await apiClient.get("/productQr/getAllQr");
   return res.data.data;
-}
+};
