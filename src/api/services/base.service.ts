@@ -310,11 +310,12 @@ export const uploadFile = async (file:File, section:string):Promise<MediaType> =
     formData.append("section", section);
     formData.append("media", file);
     const res = await axios.post(
-        "http://localhost:5000/api/upload", 
-        formData,{
+      `${process.env.NEXT_PUBLIC_API_BASE_PATH || 'http://31.97.61.201' + '/api/upload'}`,
+      formData,
+      {
         headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      }
+    );
     return res.data;
   } catch (err: any) {
     console.log(err.response.data?.error);

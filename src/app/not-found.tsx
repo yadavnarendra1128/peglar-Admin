@@ -7,10 +7,10 @@ export default function NotFoundPage() {
       <section className="bg-[url('/img/paperboard-yellow-texture.png')] min-h-screen bg-top bg-cover bg-no-repeat mx:px-[23px]">
         <div className="h-[100vh] flex flex-col justify-center">
           <div className="flex flex-col items-center gap-3">
-            <h1 className="text-[40px] md:text-[64px] font-salernomi text-[#AB185A]">
+            <h1 className="text-[40px] md:text-[64px] font-salernomi text-primary">
               Oops!
             </h1>
-            <h3 className="text-[20px] md:text-[32px] font-gilroyMedium text-[#BA6C8FE5]">
+            <h3 className="text-[20px] md:text-[32px] font-gilroyMedium text-primary/70">
               This Page is Out of Orbit.
             </h3>
             <p className="text-[16px] text-center md:text-[20px] font-gilroyMedium font-semibold text-[#BA6C8FE5]">

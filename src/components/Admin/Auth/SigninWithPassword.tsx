@@ -68,7 +68,7 @@ export default function SigninWithPassword({
       showToast(true,'User found.')
       router.push("/admin");
     } catch (err: any) {
-      setErrorMsg(        err      );
+      setErrorMsg('Error while signing.');
     }finally{
       setIsPending(false)
     }
