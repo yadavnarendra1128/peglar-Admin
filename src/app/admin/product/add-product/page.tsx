@@ -296,7 +296,6 @@ export default function AddProductPage() {
           } finally {
             setUploading(false);
             event.target.value = "";
-            sliderRef.current && sliderRef.current.slickGoTo(0);
             if(errors.media){
               setErrors((p)=>({...p,media:""}))
             }
@@ -355,10 +354,17 @@ export default function AddProductPage() {
              );
            } catch (err: any) {
              showToast(false, "Failed to delete media.", err);
-           } finally {
-             sliderRef.current && sliderRef.current.slickGoTo(0);
+           } finally{
+            if (errors.media) {
+              setErrors((p) => ({ ...p, media: "" }));
+            }
            }
          };
+
+  useEffect(()=>{
+    sliderRef.current && sliderRef.current.slickGoTo(formData.media.length ? formData.media.length-1 : formData.media.length);
+  },[formData.media])
+
 
   return (
     <DefaultLayout>
@@ -598,11 +604,11 @@ export default function AddProductPage() {
             </div>
           )}
 
-          {formData.media.length > 1 && (
+          {(
             <>
               <button
                 type="button"
-                className="button cursor-pointer hover:bg-primary/10  w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] rounded-full absolute left-2 flex items-center justify-center top-[45%] md:top-[40%] xl:top-[45%]"
+                className="button cursor-pointer hover:bg-primary/80  w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] rounded-full absolute bg-primary left-2 flex items-center justify-center top-[55%] md:top-[55%] xl:top-[55%]"
                 onClick={previous}
               >
                 <svg
@@ -615,14 +621,14 @@ export default function AddProductPage() {
                 >
                   <path
                     d="M15.4003 15.5147L22 22.1144L20.1144 24L11.6291 15.5147L20.1144 7.0295L22 8.9151L15.4003 15.5147Z"
-                    fill="#BA6C8F"
+                    fill="#fff"
                     fillOpacity="0.9"
                   />
                 </svg>
               </button>
               <button
                 type="button"
-                className="button cursor-pointer hover:bg-primary/10 w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] flex items-center justify-center rounded-full absolute right-2 top-[45%] md:top-[40%] xl:top-[45%]"
+                className="button cursor-pointer hover:bg-primary/80 w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] bg-primary flex items-center justify-center rounded-full absolute right-2 top-[55%] md:top-[55%] xl:top-[55%]"
                 onClick={next}
               >
                 <svg
@@ -635,7 +641,7 @@ export default function AddProductPage() {
                 >
                   <path
                     d="M17.5997 16.4853L11 9.88561L12.8856 8L21.3709 16.4853L12.8856 24.9705L11 23.0849L17.5997 16.4853Z"
-                    fill="#BA6C8F"
+                    fill="#fff"
                     fillOpacity="0.9"
                   />
                 </svg>
