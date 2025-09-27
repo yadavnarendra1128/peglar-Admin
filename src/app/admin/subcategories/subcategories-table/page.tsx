@@ -17,17 +17,20 @@ import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchCategory,
-  getSubcategories,
-  Subcategory,
+  deleteSubcategory,
   updateSubcategory,
-} from "api/services/base.service";
+} from "@/api/services/subcategory.service";
+import { useCategories } from "@/hooks/useCategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
+import showToast from "@/api/lib/showToast";
+import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
+import { useDeleteModal } from "@/context/DeleteModalContext";
 
 // Define the Category interface locally
-interface Category {
-  id: string;
-  name: string;
-}
+// interface Category {
+//   id: string;
+//   name: string;
+// }
 
 type TableRow = {
   subcategoryId: string;
@@ -40,29 +43,22 @@ type TableRow = {
 export default function SubcategoriesPage() {
   const qc = useQueryClient();
 
+
+  const { item, isOpen, openModal, closeModal } = useDeleteModal()
+
   // Fetch subcategories
   const {
     data: subcategories = [],
     isLoading: subsLoading,
     isError: subsError,
     error: subsErrObj,
-  } = useQuery<Subcategory[]>({
-    queryKey: ["subcategories"],
-    queryFn: getSubcategories,
-    staleTime: 60 * 1000,
-  });
+  } = useSubcategories()
 
   // Fetch categories
-  const {
-    data: categories = [],
+  const { data: categories = [],
     isLoading: catsLoading,
     isError: catsError,
-    error: catsErrObj,
-  } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchCategory,
-    staleTime: 5 * 60 * 1000,
-  });
+    error: catsErrObj, } = useCategories()
 
   // Local hide state for "delete" action
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
@@ -79,7 +75,11 @@ export default function SubcategoriesPage() {
       qc.invalidateQueries({ queryKey: ["subcategories"] });
       setEditId(null);
       setEditValue("");
+      showToast(true, "name updated successfully")
     },
+    onError: () => {
+      showToast(false, "fail to update name try again")
+    }
   });
 
   // Category map
@@ -135,9 +135,9 @@ export default function SubcategoriesPage() {
           return row.original.subcategoryName;
         },
       },
-      { accessorKey: "categoryId", header: "Category ID", size: 260 },
-      { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
-      { accessorKey: "createdAt", header: "Created At", size: 200 },
+      // { accessorKey: "categoryId", header: "Category ID", size: 260 },
+      // { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
+      // { accessorKey: "createdAt", header: "Created At", size: 200 },
       {
         id: "actions",
         header: "Actions",
@@ -201,6 +201,7 @@ export default function SubcategoriesPage() {
   }, [editId, editValue, updateMutation.isPending]);
 
   const handleHide = (row: MRT_Row<TableRow>) => {
+    openModal(row.original as any)
     const id = row.original.subcategoryId;
     setHiddenIds((prev) => {
       const next = new Set(prev);
@@ -208,6 +209,29 @@ export default function SubcategoriesPage() {
       return next;
     });
   };
+
+
+  const onConfirmDelete = async () => {
+    await deleteMutation.mutateAsync(item.id)
+  }
+
+  // Mutation for update
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: string }) =>
+      deleteSubcategory(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      showToast(true, `User ${item.name} deleted successfully`)
+    },
+    onError: (err) => {
+      showToast(false, `Failed to delete user ${item.subcategoryName}. \n ${err}`)
+    }
+  });
+
+
+
+
+
 
   if (subsLoading || catsLoading) {
     return (
@@ -239,7 +263,21 @@ export default function SubcategoriesPage() {
         data={tableData}
         initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
         enableColumnResizing
+        state={{
+          isLoading: subsLoading
+        }}
+        muiSkeletonProps={{
+          animation: "wave",
+
+        }}
+        muiCircularProgressProps={{
+          style: {
+            color: "#4F033D"
+          }
+        }}
+
       />
+      <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='subcategories' deletingField={item?.subcategoryName ?? ''} />
     </DefaultLayout>
   );
 }

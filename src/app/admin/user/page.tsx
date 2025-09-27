@@ -32,8 +32,8 @@ type TableUser = {
 export default function UserTable() {
   const router = useRouter();
   const { data, isLoading, isError, error } = useUsers();
-  const {item,isOpen,openModal,closeModal}=useDeleteModal()
   const [users,setUsers]=useState<BackendUser[]>()
+  const {item,isOpen,openModal,closeModal}=useDeleteModal()
 
   const onConfirmDelete=async()=>{
     try{

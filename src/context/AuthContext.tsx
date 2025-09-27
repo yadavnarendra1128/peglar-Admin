@@ -23,6 +23,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try{
                 setLoading(true)
                 const res = await getProfileApi()
+                console.log("AAAAAAAAAAAAAAAAA",res)
+                // setUser()
             }catch(err){
                 // router.push('/signin')
                 showToast(false,'User not found.')
