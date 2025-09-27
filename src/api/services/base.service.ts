@@ -1,5 +1,6 @@
 import { User } from "@/types/user";
 import { apiClient } from "../lib/apiClient";
+import axios from 'axios'
 
 export type Product = {
   id: string;
@@ -8,24 +9,46 @@ export type Product = {
   offer_id: string;
   qr_count: number;
   reward_amount: number;
+  Category: {
+  id:string;
+  name: {
+    en:string;
+    hi:string;
+    kn:string
+  }
+};
+  Subcategory: {
+  id: string;
+  name: string;
+};
   categoryId: string;
   subcategoryId: string;
   createdAt: string;
   updatedAt: string;
 };
 
-// export const getAllProducts = async (): Promise<Product[]> => {
-//   const res = await apiClient.get<Product[]>("/product/getProducts");
-//   return res.data;
-// };
+export type ProductType = {
+  name: string;
+  model_no: string;
+  base_price:number;
+  qr_count: number;
+  description:string;
+  reward_amount: number;
+  categoryId: string;
+  subcategoryId: string;
+  media:MediaType[]
+};
 
-// src/api/services/base.service.ts
+export type MediaType = {
+  url: string;
+  mediaType: "image" | "video";
+};
 
 // ============ Withdrawals ============
 export const getAllWithdrawals = async () => {
   const res = await apiClient.get("/withdrawal/withdrawals");
   console.log(res.data, "withdrawals data");
-  return res.data.data;
+  return res.data;
 };
 
 export const createCategory = async (data: any) => {
@@ -66,7 +89,7 @@ export const getAllUsers = async (): Promise<BackendUser[]> => {
 
 export const getProfile = async ()=>{
    try {
-     const res = await apiClient.get(`/users/profile`);
+     const res = await apiClient.get(`/users/me`);
      console.log(res,'prof')
      return res.data.user
    } catch (e:any) {
@@ -151,29 +174,55 @@ export const createSubcategory = async (
   return res.data;
 };
 
-// // QR Code Generation Types and API
-// export type GenerateBulkQRRequest = {
-//   product_id: string;
-//   count: number;
-// };
+// QR Code Generation Types and API
+export type GenerateBulkQRRequest = {
+  product_id: string;
+  count: number;
+};
 
-// export type GenerateBulkQRResponse = {
-//   message: string;
-//   total: number;
-//   downloadUrl: string;
-// };
+export type GenerateBulkQRResponse = {
+  message: string;
+  total: number;
+  downloadUrl: string;
+};
 
-// export const generateBulkQRCodes = async (
-//   payload: GenerateBulkQRRequest
-// ): Promise<GenerateBulkQRResponse> => {
-//   const res = await apiClient.post("/productQr/generate-bulk", payload);
-//   if (res.status !== 200) {
-//     console.log("Failed to generate QR codes");
-//   }
-//   console.log(res.data, "QR codes data");
-//   return res.data;
-// };
+export const generateBulkQRCodes = async (
+  payload: GenerateBulkQRRequest
+): Promise<GenerateBulkQRResponse> => {
+  const res = await apiClient.post("/productQr/generate-bulk", payload);
+  if (res.status !== 200) {
+    console.log("Failed to generate QR codes");
+  }
+  console.log(res.data, "QR codes data");
+  return res.data;
+};
 
+// Helper function to download the Excel file
+export const downloadQRExcel = async (downloadUrl: string) => {
+  const response = await apiClient.get(downloadUrl, {
+    responseType: "blob",
+    baseURL: "http://13.127.33.2:5000/",
+  });
+
+  // Try to get filename from Content-Disposition header
+  let fileName = "qr_codes.xlsx";
+  const contentDisposition = response.headers["content-disposition"];
+  if (contentDisposition) {
+    const match = contentDisposition.match(/filename="?([^"]+)"?/);
+    if (match && match[1]) fileName = match[1];
+  }
+
+  // Create a blob and trigger download
+  const blob = new Blob([response.data]);
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
 
 export const getSubcategories = async (): Promise<Subcategory[]> => {
   const res = await apiClient.get("/subcategories");
@@ -193,10 +242,10 @@ export const deleteSubcategory = async (id: string) => {
   return res.data;
 };
 
-// export const getAllProductQr = async () => {
-//   const res = await apiClient.get("/productQr/getAllQr");
-//   return res.data.data;
-// }
+export const getAllProductQr = async () => {
+  const res = await apiClient.get("/productQr/getAllQr");
+  return res.data.data;
+}
 
 // ============ Categories ============
 // export type Category = {

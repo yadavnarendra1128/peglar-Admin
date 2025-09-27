@@ -1,10 +1,12 @@
 "use client";
-
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/Admin/FormElements/InputGroup";
 import SelectGroupOne from "@/components/Admin/FormElements/SelectGroup/SelectGroupOne";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useCategories } from "@/hooks/useCategories";
 import { useSubcategories } from "@/hooks/useSubcategories";;
@@ -32,8 +34,10 @@ export default function AddProductPage() {
   const param = useSearchParams();
   const router = useRouter();
   const productId = param.get("id");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const sliderRef = useRef<Slider | null>(null); 
 
-    const {
+  const {
       data: catData,
     } = useCategories();
     const {
@@ -46,7 +50,8 @@ export default function AddProductPage() {
       { value: "", label: "None" },
     ]);
 
-  const [formData, setFormData] = useState({
+  const [file, setFile] = useState<File | null>(null);
+  const [formData, setFormData] = useState<ProductType>({
     name: "",
     model_no: "",
     description:"",
@@ -54,7 +59,10 @@ export default function AddProductPage() {
     base_price:0,
     categoryId: "",
     subcategoryId: "",
+    media:[]
   });
+  const [selectedMedia,setSelectedMedia]=useState<MediaType | null>(null)
+  const [uploading, setUploading] = useState<boolean>(false);
 
   const [submitting,setSubmitting]=useState<boolean>(false)
   const [selectedCatId,setSelectedCatId]=useState<string>('')
@@ -204,12 +212,9 @@ export default function AddProductPage() {
   };
 
   useEffect(() => {
-    console.log(productId);
-
     const fetchs = async () => {
       try {
         const res = await getProduct(productId ?? '');
-        console.log(res.Category)
         const selectedCat=res.Category.id
         const selectedSubCat = res.Subcategory.id;
         const datas = {
@@ -220,21 +225,22 @@ export default function AddProductPage() {
           finish: res.finish || 1,
           categoryId: res.Category.id,
           subcategoryId: res.Subcategory.id,
+          media: res.media
         };
         console.log(datas)
         setFormData(datas);
+        setSelectedMedia(res.media[0] ?? null)
         setSelectedCatId(selectedCat)
         setSelectedSubCatId(selectedSubCat)
       } catch (error:any) {
         console.log(error,'err')
-        showToast(true,'ede opo')
+        showToast(false,'Product not found.')
         // router.push("/admin");
       }
     };
     if (productId) fetchs();
   }, [productId]);
 
-  // console.log(formData)
   useEffect(() => {
     if (!catData) {
       return;
@@ -359,7 +365,14 @@ export default function AddProductPage() {
       {/* Page header navigation */}
       <Breadcrumb pageName="Add Product" />
 
-      <form onSubmit={handleSubmit} className="w-full mx-auto">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="absolute inset-0 z-50 w-10 h-10 opacity-0 cursor-pointer"
+        accept="image/*,video/*"
+      />
+      <div className="w-full mx-auto">
         <div className="w-full gap-9">
           {/* Form Card */}
           <div className="col-span-2 md:col-span-1">
@@ -632,13 +645,22 @@ export default function AddProductPage() {
         </div>
 
         <button
-          type="submit"
           disabled={submitting}
+          onClick={handleSubmit}
           className="mt-6 w-full rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 transition hover:bg-hoverPrimary hover:cursor-pointer disabled:bg-primary/50 disabled:cursor-not-allowed"
         >
-          Add Product
+          {productId ? "Edit Product" : "Add Product"}
         </button>
-      </form>
+      </div>
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        deletingQuery="this media"
+        onConfirm={() => selectedMedia && handleDelete()}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+        }}
+      />
     </DefaultLayout>
   );
 }
