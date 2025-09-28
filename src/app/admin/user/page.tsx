@@ -19,6 +19,9 @@ import { BackendUser, deleteUser } from "@/api/services/base.service";
 import Notfication from "@/components/Admin/users/sendNotify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/lib/apiClient";
+import { sendNotifications } from "@/api/services/notify.service";
+import NotficationModal from "@/components/Admin/users/sendNotify";
+import NotificationModal from "@/components/Admin/users/sendNotify";
 
 type TableUser = {
   id: string;
@@ -189,8 +192,8 @@ export default function UserTable() {
   }, [rowSelection])
 
   const sendMessage = async () => {
-    // if (!Object.keys(rowSelection).length)
-    //   throw new Error("please select user"+Object.keys(rowSelection));
+    if (!Object.keys(rowSelection).length)
+      throw new Error("please select user" + Object.keys(rowSelection));
 
     if ((!formData.body) && (!formData.title)) {
       throw new Error("please  enter information properly");
@@ -201,7 +204,7 @@ export default function UserTable() {
     for (let r = 0; r < tableData.length; r++) {
       const dataIndex = id[r];
       const fcmToken = tableData[dataIndex]?.fcm;
-      console.log("DDDD",fcmToken)
+      // console.log("DDDD", fcmToken)
       if (fcmToken) token.push(fcmToken);
     }
 
@@ -211,17 +214,17 @@ export default function UserTable() {
     };
     console.log(apiPayload)
 
-    // const token =rowSelection
-
-
-    const res = await apiClient.post("pushNotification/sendMany", apiPayload)
-    showToast(true, "notification sent successfully")
-    console.log(res.data)
+    notfiyMutation.mutate(apiPayload)
   }
 
 
   const notfiyMutation = useMutation({
-    mutationFn: () => sendMessage()
+    mutationFn: (payload: {
+      title: string;
+      body: string;
+      tokens: string[];
+      imageUrl: string
+    }) => sendNotifications(payload)
     ,
     onSuccess: (data, variables) => {
       qc.invalidateQueries({ queryKey: ["notifcation"] });
@@ -315,13 +318,16 @@ export default function UserTable() {
 
           />
         )}
-      <Notfication
+      <NotificationModal
         formData={formData}
         setFormData={setFormData}
         isOpen={isUpdate}
         onCancel={() => {
           setIsUpdate(false);
           setRowSelection({});
+          setFormData({
+            body:"",title:"",imageUrl:""
+          })
         }}
         onConfirm={() => sendMessage()}
       />

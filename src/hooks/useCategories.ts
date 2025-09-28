@@ -1,6 +1,6 @@
 // src/hooks/useCategories.ts
 import { useQuery } from "@tanstack/react-query";
-import { fetchCategory } from "@/api/services/base.service";
+import { fetchCategory } from "@/api/services/category.service";
 type Category = {
   id: string; // Assuming 'id' is a string for a UUID
   name: string;

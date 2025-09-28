@@ -67,8 +67,8 @@ export default function Page() {
                   onChange={(value) => handleChange("name", value)}
                   customClasses="mb-4.5"
                   required
+                  error={isError?"name field required":""}
                 />
-                {isError && <div className="text-red-600">name field required</div>}
               </div>
 
             </div>

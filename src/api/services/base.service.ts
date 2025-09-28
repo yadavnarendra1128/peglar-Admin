@@ -51,15 +51,15 @@ export const getAllWithdrawals = async () => {
   return res.data;
 };
 
-export const createCategory = async (data: any) => {
-  const response = await apiClient.post("categories", data);
-  return response.data; // <-- Added .data to return the actual data
-};
+// export const createCategory = async (data: any) => {
+//   const response = await apiClient.post("categories", data);
+//   return response.data; // <-- Added .data to return the actual data
+// };
 
-export const fetchCategory = async () => {
-  const response = await apiClient.get("categories");
-  return response.data.data; // <-- Corrected: returns the data array
-};
+// export const fetchCategory = async () => {
+//   const response = await apiClient.get("categories");
+//   return response.data.data; // <-- Corrected: returns the data array
+// };
 
 // ============ Users ============
 export type BackendUser = {

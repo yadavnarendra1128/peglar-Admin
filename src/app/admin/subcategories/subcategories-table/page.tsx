@@ -107,7 +107,7 @@ export default function SubcategoriesPage() {
       {
         id: "srno",
         header: "Sr. No.",
-        size: 70,
+        size: 1,
         enableSorting: false,
         enableColumnActions: false,
         Cell: ({ row, table }) => {
@@ -119,7 +119,7 @@ export default function SubcategoriesPage() {
       {
         accessorKey: "subcategoryName",
         header: "Subcategory Name",
-        size: 240,
+        size: 1,
         Cell: ({ row }) => {
           // If current row is in edit mode → show input
           if (editId === row.original.subcategoryId) {
@@ -141,7 +141,7 @@ export default function SubcategoriesPage() {
       {
         id: "actions",
         header: "Actions",
-        size: 150,
+        size: 1,
         Cell: ({ row }) => {
           const id = row.original.subcategoryId;
           const isEditing = editId === id;
@@ -275,6 +275,12 @@ export default function SubcategoriesPage() {
             color: "#4F033D"
           }
         }}
+        defaultColumn={{
+          size: 1,   // flex distribution
+          muiTableHeadCellProps: { sx: { flex: 1 } },
+    muiTableBodyCellProps: { sx: { flex: 1 } },
+        }}
+
 
       />
       <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='subcategories' deletingField={item?.subcategoryName ?? ''} />

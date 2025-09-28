@@ -20,7 +20,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import { useDeleteModal } from "@/context/DeleteModalContext";
-import { handleUpdate } from "@/api/services/category.service";
+import { deleteCategory, handleUpdate } from "@/api/services/category.service";
 
 // Updated type definition for the category data
 type Category = {
@@ -47,11 +47,8 @@ export default function GuruTable() {
   // This removes the item from the local state but does not call the database.
   const handleDelete = useCallback((row: MRT_Row<Category>) => {
     console.log("Locally deleting category:", row.original.id);
-    // Update the local state by filtering out the deleted row
     openModal(row.original as any)
-    setLocalData((prevData) =>
-      prevData.filter((category) => category.id !== row.original.id)
-    );
+
 
   }, []);
 
@@ -110,6 +107,24 @@ export default function GuruTable() {
       setEditValue("");
       console.log("DATAAAAAAAAAA", data)
       setLocalData((prevData) =>
+        prevData.filter((category) => category.id !== variables.id)
+      );
+      showToast(true, "name updated successfully")
+    },
+    onError: (error) => {
+      console.error('Update failed:', error)
+      showToast(false, "failed to update error")
+    },
+  });
+  const { item, isOpen, openModal, closeModal } = useDeleteModal()
+
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: string }) =>
+      deleteCategory(id),
+    onSuccess: (data, variables) => {
+      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      console.log("DATAAAAAAAAAA", data)
+      setLocalData((prevData) =>
         prevData.map((category) =>
           category.id === variables.id
             ? {
@@ -127,27 +142,10 @@ export default function GuruTable() {
       showToast(false, "failed to update error")
     },
   });
-  const { item, isOpen, openModal, closeModal } = useDeleteModal()
 
   const onConfirmDelete = async () => {
-    try {
-      // await deleteUser(item.id)
-      // setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
-      // if(!val)return []
-      // else return val
-      // })
-
-      showToast(true, `User ${item.name} deleted successfully`)
-    } catch (err) {
-      showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
-    }
+    deleteMutation.mutate({id:item.id})
   }
-
-
-
-
-
-
 
 
   const columns = useMemo<MRT_ColumnDef<Category>[]>(
@@ -155,7 +153,6 @@ export default function GuruTable() {
       {
         header: "Sr. No.",
         accessorKey: "srNo",
-        size: 50,
         Cell: ({ row }) => row.index + 1,
         enableSorting: false,
         enableColumnFilter: false,
@@ -163,7 +160,7 @@ export default function GuruTable() {
       {
         accessorKey: "id",
         header: "Category ID",
-        size: 200,
+
         Cell: ({ cell }) => {
           const fullId = cell.getValue<string>();
           const shortId = fullId ? `${fullId.slice(0, 5)}...` : "-";
@@ -188,7 +185,7 @@ export default function GuruTable() {
       {
         accessorKey: "CategoryName",
         header: "Category Name",
-        size: 240,
+
         Cell: ({ row }) => {
           // If current row is in edit mode → show input
           console.log("DDDDDDD0", editId === row.original.id)
@@ -223,7 +220,7 @@ export default function GuruTable() {
       {
         accessorKey: "updatedAt",
         header: "Updated At",
-        size: 200,
+        size: 1,
         Cell: ({ cell }) =>
           cell.getValue<string>()
             ? new Date(cell.getValue<string>()).toLocaleString()
@@ -232,7 +229,7 @@ export default function GuruTable() {
       {
         id: "actions",
         header: "Actions",
-        size: 200,
+
         Cell: ({ row }) => {
           const id = row.original.id;
           const isEditing = editId === id;
@@ -340,6 +337,11 @@ export default function GuruTable() {
           }
         }}
         enableColumnResizing
+        defaultColumn={{
+          size: 1,   // flex distribution
+          muiTableHeadCellProps: { sx: { flex: 1 } },
+          muiTableBodyCellProps: { sx: { flex: 1 } },
+        }}
       />
     );
   };

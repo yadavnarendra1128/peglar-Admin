@@ -21,15 +21,15 @@ export const sendPayment = async (
     if (upiId !== user.upiDetails?.upiId) throw new Error("user not found");
 
     const payload = {
-      amount:1,
+      amount,
       payment_mode: "UPI",
       transcation_note: "testing",
       beneficiaryName: user.name,
       upi: upiId,
     };
     console.log("SUCCESSS", payload);
-    const payoutResponse = await apiClient.post("/payout", payload)
-    return payoutResponse
+    // const payoutResponse = await apiClient.post("/payout", payload)
+    // return payoutResponse
   } catch (e) {
     console.log(e);
   }

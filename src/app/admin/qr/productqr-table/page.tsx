@@ -14,6 +14,7 @@ import showToast from "@/api/lib/showToast";
 import { useProductsQr } from "@/hooks/useProductsQr";
 import UpdateRewardAmount from "@/components/Admin/qr/updateRewardAmount";
 import { QrCode } from "@/types/qrCode";
+import { useProducts } from "@/hooks/useProducts";
 
 // Define a new type for the API response data
 // type QrCode = {
@@ -29,7 +30,26 @@ import { QrCode } from "@/types/qrCode";
 //   createdAt: string;
 //   updatedAt: string;
 // };
+type productList = {
+  id: string,
+  name: string
+}
+type QrCodeTable = {
+  id: string;
+  product_id: string;
+  qr_value: string;
+  batch_no: string;
+  is_scanned: boolean;
+  is_redeemed: boolean;
+  scanned_by: string;
+  scanned_at: string;
+  redeemed_at: string;
+  createdAt: string;
+  updatedAt: string;
+  reward_amount: string,
+  product_name: string 
 
+}
 export default function CertificateTable() {
   // const [data, setData] = useState<QrCode[]>([]);
   // const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +58,16 @@ export default function CertificateTable() {
     if (!data) return []
     return data
   }, [data])
+  const { data: product, isLoading: productLoading } = useProducts();
+  const [productList, setProductList] = useState<productList[]>([])
 
+  useEffect(() => {
+    if (!product?.length) {
+      return
+    }
+    console.log("AAAAAA", product)
+    setProductList(product.map(x => ({ id: x.id, name: x.name })))
+  }, [product])
   const [defaultValue, setDefaultValue] = useState({
     reward_amount: "",
     batch_no: "",
@@ -46,13 +75,27 @@ export default function CertificateTable() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [rowSelection, setRowSelection] = useState({});
 
-  const columns = useMemo<MRT_ColumnDef<QrCode>[]>(
+
+  const mergeDataTable: QrCodeTable[] = useMemo(() => {
+    if (!productQrData) return []
+    return productQrData.map(x => ({
+      ...x,
+      product_name: productList.find((p) => x.product_id === p.id)?.name || ""
+    }))
+  }, [productQrData, productList])
+  const columns = useMemo< MRT_ColumnDef<QrCodeTable>[]>(
     () => [
       { accessorKey: "qr_value", header: "QR Value", size: 150 },
+
       { accessorKey: "batch_no", header: "Batch No", size: 150 },
       {
         accessorKey: "reward_amount",
         header: "Reward",
+        size: 100,
+      },
+      {
+        accessorKey: "product_name",
+        header: "Product Name",
         size: 100,
       },
       {
@@ -92,7 +135,7 @@ export default function CertificateTable() {
       //   Cell: ({ row }) => (
       //     <div style={{ display: "flex", gap: "1.5rem" }}>
       //       {/* The action icons remain the same but will now work with the new data type */}
-      //       <svg
+      //       {/* <svg
       //         xmlns="http://www.w3.org/2000/svg"
       //         viewBox="0 0 512 512"
       //         className="fill-current cursor-pointer"
@@ -139,12 +182,28 @@ export default function CertificateTable() {
       //           fill="#6b7280"
       //           d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"
       //         />
-      //       </svg>
+      //       </svg> */}
+      //       {/* <button
+      //         onClick={() => {
+      //            setIsUpdate(true);
+      //         }}
+      //         title="update Reward Amount"
+      //         style={{
+      //           background: "#4F9DFF",
+      //           color: "white",
+      //           padding: "4px 8px",
+      //           borderRadius: "4px",
+      //           border: "none",
+      //           cursor: "pointer",
+      //         }}
+      //       >
+      //         update
+      //       </button> */}
       //     </div>
       //   ),
       // },
     ],
-    []
+    [productQrData]
   );
 
   const handleResend = (row: MRT_Row<QrCode>) => {
@@ -221,8 +280,8 @@ export default function CertificateTable() {
       <Breadcrumb pageName="QR Code Table" />
       <MaterialReactTable
         columns={[...columns]}
-        data={productQrData}
-        state={{ isLoading, rowSelection }} // Pass the loading state to the table
+        data={mergeDataTable}
+        state={{ isLoading: (isLoading || productLoading), rowSelection }} // Pass the loading state to the table
         initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
         muiSkeletonProps={{
           animation: "wave",
@@ -236,9 +295,26 @@ export default function CertificateTable() {
         enableMultiRowSelection={false}
         onRowSelectionChange={(updater) => {
           setRowSelection(updater);
-          setIsUpdate(true);
+          // setIsUpdate(true);
         }}
-        
+        renderTopToolbarCustomActions={() => (
+          Object.keys(rowSelection).length ? <button
+            onClick={() => {
+              setIsUpdate(true);
+            }}
+            title="update Reward Amount"
+            style={{
+              background: "#4F9DFF",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            update
+          </button> : null
+        )}
 
       />
 
