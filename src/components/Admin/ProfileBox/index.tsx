@@ -103,7 +103,7 @@ const ProfileBox = () => {
         <div className="flex flex-col gap-4 mb-5" style={{ margin: "0 20px" }}>
           {user?.phone && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 dark:text-gray-300">
+              <span className="font-medium text-gray-700 ">
                 Mobile:
               </span>{" "}
               {user?.phone}
@@ -112,7 +112,7 @@ const ProfileBox = () => {
 
           {user?.profession && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 dark:text-gray-300">
+              <span className="font-medium text-gray-700 ">
                 Profession:
               </span>{" "}
               {user?.profession}
@@ -121,7 +121,7 @@ const ProfileBox = () => {
 
           {user?.language && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 dark:text-gray-300">
+              <span className="font-medium text-gray-700 ">
                 Language:
               </span>{" "}
               {user?.language}
@@ -129,7 +129,7 @@ const ProfileBox = () => {
           )}
 
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 dark:text-gray-300">
+            <span className="font-medium text-gray-700 ">
               User Type:
             </span>{" "}
             <span
@@ -140,7 +140,7 @@ const ProfileBox = () => {
             </span>
           </p>
           {/* <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 dark:text-gray-300">
+            <span className="font-medium text-gray-700 ">
               Landmark:
             </span>{" "}
             <span
@@ -151,7 +151,7 @@ const ProfileBox = () => {
             </span>
           </p>
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 dark:text-gray-300">
+            <span className="font-medium text-gray-700 ">
               Postal:
             </span>{" "}
             400521
@@ -192,7 +192,7 @@ const ProfileBox = () => {
               </span>
             ))}
             {tags.length === 0 && (
-              <p className="text-gray-500 dark:text-gray-300">
+              <p className="text-gray-500 ">
                 No pages selected.
               </p>
             )}
