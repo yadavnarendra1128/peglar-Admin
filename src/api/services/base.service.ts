@@ -117,6 +117,29 @@ export const deleteUser = async (id:string)=>{
   }
 }
 
+export const registerUser = async(payload:any)=>{
+  const formData = new FormData();
+formData.append("name", payload.name);
+formData.append("phone", payload.phone);
+
+// Stringify JSON details
+formData.append("aadharDetails", JSON.stringify({ aadharNumber: payload.aadharNumber }));
+formData.append("panDetails", JSON.stringify({ panNumber: payload.panNumber }));
+
+// Append files
+formData.append("aadharImage", payload.aadharFile);
+formData.append("panImage", payload.panFile);
+
+  try{
+    const res = await axios.post(`/users/register`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+console.log(res)
+    return res
+  }catch(e){
+    console.log(e)
+  }
+}
 // ============ Product ============
 
 export const getAllProducts = async (): Promise<Product[]> => {
