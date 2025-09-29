@@ -139,7 +139,7 @@ export default function UserTable() {
               onClick={() => handleDelete(row)}
               title="Delete User"
               style={{
-                background: "#ff4d4d",
+                background: "#4F9DFF",
                 color: "white",
                 padding: "4px 8px",
                 borderRadius: "4px",
@@ -174,7 +174,7 @@ export default function UserTable() {
   }, [users]);
 
   useEffect(() => {
-    setUsers(data)
+    setUsers(data?.filter(x=>x.is_active))
   }, [data])
 
   useEffect(() => {

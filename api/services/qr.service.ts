@@ -52,3 +52,4 @@ export const getAllProductQr = async () => {
   const res = await apiClient.get("/productQr/getAllQr");
   return res.data.data;
 };
+

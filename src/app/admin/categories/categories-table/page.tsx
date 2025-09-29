@@ -28,6 +28,7 @@ type Category = {
   name: string;
   createdAt: string;
   updatedAt: string;
+  is_active:boolean;
 };
 
 export default function GuruTable() {
@@ -39,7 +40,7 @@ export default function GuruTable() {
   const [localData, setLocalData] = useState<Category[]>([]);
   useEffect(() => {
     if (data) {
-      setLocalData(data);
+      setLocalData(data.filter(x=>x.is_active));
     }
   }, [data]);
 
@@ -122,20 +123,12 @@ export default function GuruTable() {
     mutationFn: ({ id }: { id: string }) =>
       deleteCategory(id),
     onSuccess: (data, variables) => {
-      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      qc.invalidateQueries({ queryKey: ["categories"] });
       console.log("DATAAAAAAAAAA", data)
       setLocalData((prevData) =>
-        prevData.map((category) =>
-          category.id === variables.id
-            ? {
-              ...category,
-              name: data["name"],
-              updatedAt: data["updatedAt"],
-            } // Optionally update `updatedAt`
-            : category
-        )
+        prevData.filter((category) =>category.id !== variables.id)
       );
-      showToast(true, "name updated successfully")
+      showToast(true,data.message)
     },
     onError: (error) => {
       console.error('Update failed:', error)
@@ -273,14 +266,14 @@ export default function GuruTable() {
                 </IconButton>
               )}
 
-              {/* <IconButton
+              <IconButton
                 color="error"
                 size="small"
                 title="Hide"
                 onClick={() => handleDelete(row)}
               >
                 <DeleteIcon fontSize="small" />
-              </IconButton> */}
+              </IconButton>
             </div>
           );
         },

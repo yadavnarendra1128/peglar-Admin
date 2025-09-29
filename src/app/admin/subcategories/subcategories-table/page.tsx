@@ -21,7 +21,7 @@ import {
   updateSubcategory,
 } from "@/api/services/subcategory.service";
 import { useCategories } from "@/hooks/useCategories";
-import { useSubcategories } from "@/hooks/useSubcategories";
+import { Subcategory, useSubcategories } from "@/hooks/useSubcategories";
 import showToast from "@/api/lib/showToast";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import { useDeleteModal } from "@/context/DeleteModalContext";
@@ -54,7 +54,7 @@ export default function SubcategoriesPage() {
     error: subsErrObj,
   } = useSubcategories()
 
-  // Fetch categories
+  // // Fetch categories
   const { data: categories = [],
     isLoading: catsLoading,
     isError: catsError,
@@ -82,6 +82,8 @@ export default function SubcategoriesPage() {
     }
   });
 
+
+  // Category map
   // Category map
   const categoryMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -92,15 +94,29 @@ export default function SubcategoriesPage() {
   // Table data
   const tableData: TableRow[] = useMemo(() => {
     return subcategories
-      .filter((s) => !hiddenIds.has(s.id))
-      .map((s) => ({
+      .map((s:Subcategory) => ({
         subcategoryId: s.id,
         subcategoryName: s.name,
         categoryId: s.categoryId,
         categoryName: categoryMap.get(s.categoryId) ?? "-",
         createdAt: new Date(s.createdAt).toLocaleString(),
-      }));
-  }, [subcategories, categoryMap, hiddenIds]);
+
+      }))
+    .filter((s:Subcategory)=>categoryMap.has(s.categoryId));
+  }, [subcategories, categoryMap]);
+
+  //   // Table data
+  // const tableData: TableRow[] = useMemo(() => {
+  //   return subcategories
+  //     .map((s:Subcategory) => ({
+  //       subcategoryId: s.id,
+  //       subcategoryName: s.name,
+  //       categoryId: s.categoryId,
+  //       categoryName: s.Category?.name,
+  //       createdAt: new Date(s.createdAt).toLocaleString(),
+  //     }));
+  // }, [subcategories, hiddenIds]);
+
 
   const columns = useMemo<MRT_ColumnDef<TableRow>[]>(() => {
     return [
@@ -185,14 +201,14 @@ export default function SubcategoriesPage() {
                 </IconButton>
               )}
 
-              {/* <IconButton
+              <IconButton
                 color="error"
                 size="small"
                 title="Hide"
-                onClick={() => handleHide(row)}
+                onClick={() =>openModal(row.original as any)}
               >
                 <DeleteIcon fontSize="small" />
-              </IconButton> */}
+              </IconButton>
             </div>
           );
         },
@@ -200,19 +216,19 @@ export default function SubcategoriesPage() {
     ];
   }, [editId, editValue, updateMutation.isPending]);
 
-  const handleHide = (row: MRT_Row<TableRow>) => {
-    openModal(row.original as any)
-    const id = row.original.subcategoryId;
-    setHiddenIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
-  };
+  // const handleHide = (row: MRT_Row<TableRow>) => {
+    
+  //   const id = row.original.subcategoryId;
+  //   setHiddenIds((prev) => {
+  //     const next = new Set(prev);
+  //     next.add(id);
+  //     return next;
+  //   });
+  // };
 
 
   const onConfirmDelete = async () => {
-    await deleteMutation.mutateAsync(item.id)
+   deleteMutation.mutate({id:item.subcategoryId} )
   }
 
   // Mutation for update
@@ -221,10 +237,10 @@ export default function SubcategoriesPage() {
       deleteSubcategory(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["subcategories"] });
-      showToast(true, `User ${item.name} deleted successfully`)
+      showToast(true, `deleted successfully`)
     },
     onError: (err) => {
-      showToast(false, `Failed to delete user ${item.subcategoryName}. \n ${err}`)
+      showToast(false, `Failed to delete user ${item?.subcategoryName}. \n ${err}`)
     }
   });
 
@@ -233,7 +249,7 @@ export default function SubcategoriesPage() {
 
 
 
-  if (subsLoading || catsLoading) {
+  if (subsLoading) {
     return (
       <DefaultLayout>
         <Breadcrumb pageName="Subcategories" />
@@ -242,7 +258,7 @@ export default function SubcategoriesPage() {
     );
   }
 
-  if (subsError || catsError) {
+  if (subsError || catsErrObj) {
     const message =
       (subsErrObj as Error)?.message ||
       (catsErrObj as Error)?.message ||
@@ -278,7 +294,7 @@ export default function SubcategoriesPage() {
         defaultColumn={{
           size: 1,   // flex distribution
           muiTableHeadCellProps: { sx: { flex: 1 } },
-    muiTableBodyCellProps: { sx: { flex: 1 } },
+          muiTableBodyCellProps: { sx: { flex: 1 } },
         }}
 
 

@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import Signin from "@/components/Admin/Auth/Signin";
 
 export const metadata: Metadata = {
-  title: "Next.js Login Page | NextAdmin - Next.js Dashboard Kit",
+  title: "Peglar Admin login",
   description: "This is Next.js Login Page NextAdmin Dashboard Kit",
 };
 

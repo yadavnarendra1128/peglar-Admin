@@ -5,12 +5,13 @@ export type CreateSubcategoryDto = {
   categoryId: string;
 };
 
-export type Subcategory = {
+ type Subcategory = {
   id: string;
   name: string;
   categoryId: string;
   createdAt: string;
   updatedAt: string;
+  is_active:string
 };
 
 export const createSubcategory = async (

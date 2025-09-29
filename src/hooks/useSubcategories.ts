@@ -7,8 +7,11 @@ export type Subcategory = {
   categoryId: string;
   createdAt: string;
   updatedAt: string;
+  is_active: boolean;
   Category?: { id: string; name: string }; // include ke saath aa sakta hai
-};
+
+}
+  ;
 
 export function useSubcategories() {
   return useQuery<Subcategory[], Error>({
