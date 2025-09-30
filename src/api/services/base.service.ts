@@ -69,6 +69,8 @@ export type BackendUser = {
   phone?: string;
   profileImg?: string | null;
   userType: "customer" | "dealer" | "carpenter" | "admin";
+  aadharDetails?: { aadharNumber: string; aadharImage: string };
+  panDetails?: { panNumber: string; pamImage: string };
   isVerified: boolean;
   lifetime_earning: string;
   createdAt: string;

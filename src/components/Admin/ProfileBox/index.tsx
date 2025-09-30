@@ -58,7 +58,7 @@ const ProfileBox = () => {
 
   return (
     <>
-      <div className="overflow-hidden rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
+      <div className="overflow-hidden rounded-[10px] pb-8 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
         <div className="relative z-20 h-35 md:h-65">
           <Image
             src={"/images/cover/cover-01.png"}
@@ -110,24 +110,6 @@ const ProfileBox = () => {
             </p>
           )}
 
-          {user?.profession && (
-            <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                Profession:
-              </span>{" "}
-              {user?.profession}
-            </p>
-          )}
-
-          {user?.language && (
-            <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                Language:
-              </span>{" "}
-              {user?.language}
-            </p>
-          )}
-
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
             <span className="font-medium text-gray-700 ">
               User Type:
@@ -139,27 +121,24 @@ const ProfileBox = () => {
               {user?.userType}
             </span>
           </p>
-          {/* <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 ">
-              Landmark:
-            </span>{" "}
-            <span
-              className="w-1/2"
+
+          {user?.userType=='carpenter' && (
+            <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
+              <span className="font-medium text-gray-700 ">
+                isVerified:
+              </span>{" "}
+              <span
+              // className="w-1/2 capitalize"
               style={{ width: "50%", textAlign: "right" }}
             >
-              Near Thane Municipal Corporation
+              {String(user?.isVerified)}
             </span>
-          </p>
-          <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 ">
-              Postal:
-            </span>{" "}
-            400521
-          </p> */}
-        </div>
+            </p>
+          )}
+    </div>
 
         {/* Checkbox Section */}
-        <div className="px-4 py-6">
+        {/* <div className="px-4 py-6">
           <h4 className="text-xl font-bold mb-4">Select Pages:</h4>
           <div className="flex flex-wrap gap-2">
             {pages.map((tag) => (
@@ -171,9 +150,10 @@ const ProfileBox = () => {
               />
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Tag Display Section */}
+        {/*
         <div className="px-4 py-6">
           <div className="w-full min-h-[100px] border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -198,16 +178,17 @@ const ProfileBox = () => {
             )}
           </div>
         </div>
+      */}
 
         {/* Submit Button */}
-        <div className="px-4 py-6">
+        {/* <div className="px-4 py-6">
           <button
             onClick={handleSubmit}
             className="mt-3 flex w-full justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit"
           >
             Give Permission
           </button>
-        </div>
+        </div> */}
       </div>
     </>
   );

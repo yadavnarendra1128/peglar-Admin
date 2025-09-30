@@ -38,6 +38,7 @@ const menuGroups = [
         label: "User",
         route: "#",
         children: [
+          { label: "Add User", route: "/admin/user/add-user" },
           { label: "User Table", route: "/admin/user" },
           { label: "Transaction Table", route: "/admin/user/transaction" },
         ],

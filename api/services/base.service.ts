@@ -1,5 +1,5 @@
 import { User } from "@/types/user";
-import { apiClient } from "../lib/apiClient";
+import { apiClient, basePath } from "../lib/apiClient";
 import axios from 'axios'
 
 export type Product = {
@@ -12,15 +12,15 @@ export type Product = {
   Category: {
   id:string;
   name: {
-    en:string;
-    hi:string;
-    kn:string
-  }
-};
+      en:string;
+      hi:string;
+      kn:string
+    }
+  };
   Subcategory: {
   id: string;
   name: string;
-};
+  };
   categoryId: string;
   subcategoryId: string;
   createdAt: string;
@@ -46,7 +46,6 @@ export type MediaType = {
 // ============ Withdrawals ============
 export const getAllWithdrawals = async () => {
   const res = await apiClient.get("/withdrawal/withdrawals");
-  console.log(res.data, "withdrawals data");
   return res.data;
 };
 
@@ -86,10 +85,20 @@ export const getAllUsers = async (): Promise<BackendUser[]> => {
    }
 };
 
+
+export const getAllCarpenters = async (): Promise<BackendUser[]> => {
+  try {
+    const res = await apiClient.get("/users/all-carpenter");
+    return res.data.data;
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
+};
+
 export const getProfile = async ()=>{
    try {
      const res = await apiClient.get(`/users/me`);
-     console.log(res,'prof')
      return res.data.user
    } catch (e:any) {
      console.log(e);
@@ -192,7 +201,6 @@ export const generateBulkQRCodes = async (
   if (res.status !== 200) {
     console.log("Failed to generate QR codes");
   }
-  console.log(res.data, "QR codes data");
   return res.data;
 };
 
@@ -283,7 +291,6 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
   const res = await apiClient.post("/users/login", payload);
   return res.data;
   }catch(err: any){
-    console.log(err.response.data?.error);
     throw (
       err.response.data?.error || err?.message || "Invalid credentials"
     );
@@ -303,11 +310,12 @@ export const getProfileApi = async (): Promise<User> => {
 // ------ upload ---------------
 export const uploadFile = async (file:File, section:string):Promise<MediaType> => {
   try {
+   const finalPath = basePath || 'http://31.97.61.201' 
     const formData = new FormData();
     formData.append("section", section);
     formData.append("media", file);
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_PATH || 'http://31.97.61.201' + '/api/upload'}`,
+      `${finalPath}/api/upload`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -333,3 +341,4 @@ export const deleteFile = async (body:{
     throw "Failed to upload image.";
   }
 };
+

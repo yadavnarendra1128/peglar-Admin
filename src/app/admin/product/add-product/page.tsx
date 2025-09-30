@@ -68,6 +68,8 @@ export default function AddProductPage() {
   const [selectedCatId,setSelectedCatId]=useState<string>('')
   const [selectedSubCatId, setSelectedSubCatId] = useState<string>("");
 
+  const [filesToBeDeleted,setFilesToBeDeleted]=useState<any>([])
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<errorDataType>({
@@ -142,73 +144,6 @@ export default function AddProductPage() {
 
     setErrors(newErrors);
     return Object.values(newErrors).every((v) => v === "");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const valid = isValid();
-    if(valid){
-    try {
-      setSubmitting(true)
-      if (!basePath) {
-        throw new Error("API base PATH is missing. Check your .env file.");
-      }
-
-      if(productId){
-        const res = await fetch(`${basePath}/api/product/updateProduct/${productId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        if (!res.ok) {
-        const errorText = await res.text(); // Read raw error response
-        console.error("Server error response:", errorText);
-        throw new Error(
-          `Failed to update product: ${errorText || res.statusText}`
-        );
-        }
-        showToast(true, "Product has been updated successfully!");
-        // setTimeout(() => router.push("/admin/product/product-table"), 1000);
-      }else{
-      const res = await fetch(`${basePath}/api/product/createProduct`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        const errorText = await res.text(); // Read raw error response
-        console.error("Server error response:", errorText);
-        throw new Error(
-          `Failed to create product: ${errorText || res.statusText}`
-        );
-      }
-      showToast(true, "Product has been created successfully!");
-      // setTimeout(()=>router.push("/admin/product/product-table"),1000)
-      }
-
-      setFormData({
-        name: "",
-        model_no: "",
-        description:"",
-        finish:"",
-        base_price:0,
-        media: [],
-        categoryId: "",
-        subcategoryId: "",
-      });
-
-      setSelectedCatId('')
-      setSelectedSubCatId('')
-      setSelectedMedia(null)
-    } catch (error:any) {
-      console.error("Error creating product:", error);
-      showToast(false,error);
-    }finally{
-      setSubmitting(false)
-    }}else{
-       showToast(false, "Check errors above.");
-    }
   };
 
   useEffect(() => {
@@ -335,7 +270,7 @@ export default function AddProductPage() {
            const mediaName = selectedMedia.url;
            const data = { fileName: mediaName };
            try {
-             await deleteFile(data);
+            //  await deleteFile(data);
              setFormData((prev) => {
                const filtered = prev.media.filter(
                  (m) =>
@@ -347,6 +282,7 @@ export default function AddProductPage() {
                  media: filtered,
                };
              });
+             setFilesToBeDeleted((p: string) => [...p, data.fileName]);
 
              showToast(
                true,
@@ -358,6 +294,110 @@ export default function AddProductPage() {
             if (errors.media) {
               setErrors((p) => ({ ...p, media: "" }));
             }
+           }
+         };
+
+         console.log(filesToBeDeleted)
+
+         const handleDeleteBackend = async () => {
+           if (!filesToBeDeleted.length) return;
+          console.log(filesToBeDeleted,'files')
+           const results = await Promise.allSettled(
+             filesToBeDeleted.map((file: string) =>
+               deleteFile({ fileName: file })
+             )
+           );
+
+           results.forEach((res, idx) => {
+             const fileName = filesToBeDeleted[idx];
+             if (res.status === "fulfilled") {
+               showToast(true, `Deleted ${fileName} successfully.`);
+             } else {
+               showToast(false, `Failed to delete ${fileName}.`);
+             }
+           });
+
+           setFilesToBeDeleted([]);
+
+           sliderRef.current?.slickGoTo(0);
+         };
+
+         const handleSubmit = async (e: React.FormEvent) => {
+           e.preventDefault();
+           e.stopPropagation();
+           const valid = isValid();
+           if (valid) {
+             try {
+               setSubmitting(true);
+               if (!basePath) {
+                 throw new Error(
+                   "API base PATH is missing. Check your .env file."
+                 );
+               }
+
+               console.log('called backend')
+               await handleDeleteBackend()
+
+               if (productId) {
+                 const res = await fetch(
+                   `${basePath}/api/product/updateProduct/${productId}`,
+                   {
+                     method: "PUT",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify(formData),
+                   }
+                 );
+                 if (!res.ok) {
+                   const errorText = await res.text(); // Read raw error response
+                   console.error("Server error response:", errorText);
+                   throw new Error(
+                     `Failed to update product: ${errorText || res.statusText}`
+                   );
+                 }
+                 showToast(true, "Product has been updated successfully!");
+                 // setTimeout(() => router.push("/admin/product/product-table"), 1000);
+               } else {
+                 const res = await fetch(
+                   `${basePath}/api/product/createProduct`,
+                   {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify(formData),
+                   }
+                 );
+                 if (!res.ok) {
+                   const errorText = await res.text(); // Read raw error response
+                   console.error("Server error response:", errorText);
+                   throw new Error(
+                     `Failed to create product: ${errorText || res.statusText}`
+                   );
+                 }
+                 showToast(true, "Product has been created successfully!");
+                 // setTimeout(()=>router.push("/admin/product/product-table"),1000)
+               }
+
+               setFormData({
+                 name: "",
+                 model_no: "",
+                 description: "",
+                 finish: "",
+                 base_price: 0,
+                 media: [],
+                 categoryId: "",
+                 subcategoryId: "",
+               });
+
+               setSelectedCatId("");
+               setSelectedSubCatId("");
+               setSelectedMedia(null);
+             } catch (error: any) {
+               console.error("Error creating product:", error);
+               showToast(false, error);
+             } finally {
+               setSubmitting(false);
+             }
+           } else {
+             showToast(false, "Check errors above.");
            }
          };
 

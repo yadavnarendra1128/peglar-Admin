@@ -1,5 +1,4 @@
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import { Metadata } from "next";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import ProfileBox from "@/components/Admin/ProfileBox";
 

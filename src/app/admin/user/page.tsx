@@ -10,12 +10,13 @@ import {
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import { useRouter } from "next/navigation";
-import { useUsers } from "@/hooks/useUsers";
+import { useCarpenters, useUsers } from "@/hooks/useUsers";
 import { Typography } from "@mui/material";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import showToast from "../../../../api/lib/showToast";
 import { BackendUser, deleteUser } from "@/api/services/base.service";
+import { formatDateTime } from "@/utils/formatDateTime";
 
 type TableUser = {
   id: string;
@@ -23,6 +24,8 @@ type TableUser = {
   email: string;
   phone?: string;
   userType: string;
+  aadharDetails?: { aadharNumber: string; aadharImage: string };
+  panDetails?: { panNumber: string; pamImage: string };
   isVerified: boolean;
   lifetime_earning: string;
   createdAt: string;
@@ -32,8 +35,11 @@ type TableUser = {
 export default function UserTable() {
   const router = useRouter();
   const { data, isLoading, isError, error } = useUsers();
+  const { data:carpenterData, isLoading:carpIsLoading, isError:carpIsError, error:carpError } = useCarpenters();
   const {item,isOpen,openModal,closeModal}=useDeleteModal()
   const [users,setUsers]=useState<BackendUser[]>()
+  const [carps, setCarps] = useState<BackendUser[]>();
+  const [selected,setSelected]=useState<'user'|'carpenter'>('user')
 
   const onConfirmDelete=async()=>{
     try{
@@ -85,11 +91,7 @@ export default function UserTable() {
         accessorKey: "createdAt",
         header: "Created At",
         size: 200,
-        Cell: ({ cell }) => {
-          const v = cell.getValue<string>();
-          const dt = v ? new Date(v) : null;
-          return dt ? dt.toLocaleString() : "-";
-        },
+        Cell: ({ cell }) => formatDateTime(cell.getValue<string>()),
       },
       {
         id: "actions",
@@ -103,6 +105,19 @@ export default function UserTable() {
               justifyContent: "center",
             }}
           >
+            {/* Verified tick */}
+            {row.original.isVerified && (
+              <span
+                title="Verified"
+                style={{
+                  color: "green",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                }}
+              >
+                ✓
+              </span>
+            )}
             {/* View Action */}
             <button
               onClick={() => handleView(row)}
@@ -141,9 +156,9 @@ export default function UserTable() {
   );
 
   const tableData: TableUser[] = useMemo(() => {
-      // console.log(users)
-      if (!users) return [];
-      return users.map((u) => ({
+      const list = selected === "user" ? users : carps;
+      if (!list) return [];
+      return list.map((u) => ({
         id: u.id,
         name: u.name,
         email: u.email ?? "",
@@ -154,72 +169,101 @@ export default function UserTable() {
         createdAt: u.createdAt,
         profileImg: u.profileImg ?? null,
       }));
-    }, [users]);
+    }, [users,carps,selected]);
 
   useEffect(()=>{
     setUsers(data)
-  },[data])
+    setCarps(carpenterData)
+  },[data,carpenterData])
 
   return (
     <DefaultLayout>
       {/* Page header with breadcrumb navigation */}
       <Breadcrumb pageName="User Table" />
 
-      {
-        isError ? (
-          // Error state
-          <Typography color="error" sx={{ p: 2 }}>
-            Failed to load users: {error?.message}
-          </Typography>
-        ) : (
-          // Data table
-          <MaterialReactTable
-            columns={columns}
-            data={tableData}
-            initialState={{
-              pagination: { pageSize: 5, pageIndex: 0 },
-            }}
-            enableColumnResizing
-            muiTableProps={{
-              sx: {
-                border: "1px solid #ccc",
-              },
-            }}
-            muiTableHeadCellProps={{
-              sx: {
-                backgroundColor: "#f5f5f5",
-                fontWeight: "bold",
-                borderBottom: "2px solid #ccc",
-              },
-            }}
-            muiTableBodyCellProps={{
-              sx: {
-                borderBottom: "1px solid #e0e0e0",
-              },
-            }}
-            muiTableBodyRowProps={({ row }) => ({
-              sx: {
-                backgroundColor: row.index % 2 === 0 ? "#fafafa" : "white",
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                },
-              },
-            })}
-            state={{
-              isLoading: isLoading
-            }}
-            muiSkeletonProps={{
-              animation: "wave",
+      <div className="flex gap-2 mb-2 items-center">
+        <button
+          className={`px-4 py-2 rounded-lg cursor-pointer ${
+            selected === "user"
+              ? "bg-primary border border-primary text-white hover:border-hoverPrimary hover:bg-hoverPrimary"
+              : "border border-primary text-primary hover:bg-primary/10 hover:text-white"
+          }`}
+          onClick={() => setSelected("user")}
+        >
+          Users
+        </button>
+        <button
+          className={`px-4 py-2 rounded-lg cursor-pointer ${
+            selected === "carpenter"
+              ? "bg-primary border border-primary text-white hover:border-hoverPrimary hover:bg-hoverPrimary"
+              : "border border-primary text-primary hover:bg-primary/10 hover:text-white"
+          }`}
+          onClick={() => setSelected("carpenter")}
+        >
+          Carpenters
+        </button>
+      </div>
 
-            }}
-            muiCircularProgressProps={{
-              style: {
-                color: "#4F033D"
-              }
-            }}
-          />
-        )}
-        <DeleteModal isOpen={isOpen} onConfirm={onConfirmDelete} onCancel={closeModal} deletingQuery='user' deletingField={item?.name ?? ''}/>
+      {(selected === "user" && isError) ||
+      (selected === "carpenter" && carpIsError) ? (
+        <Typography color="error" sx={{ p: 2 }}>
+          Failed to load {selected === "user" ? "users" : "carpenters"}:{" "}
+          {selected === "user" ? error?.message : carpError?.message}
+        </Typography>
+      ) : (
+        // Data table
+        <MaterialReactTable
+          columns={columns}
+          data={tableData}
+          initialState={{
+            pagination: { pageSize: 5, pageIndex: 0 },
+          }}
+          enableColumnResizing
+          muiTableProps={{
+            sx: {
+              border: "1px solid #ccc",
+            },
+          }}
+          muiTableHeadCellProps={{
+            sx: {
+              backgroundColor: "#f5f5f5",
+              fontWeight: "bold",
+              borderBottom: "2px solid #ccc",
+            },
+          }}
+          muiTableBodyCellProps={{
+            sx: {
+              borderBottom: "1px solid #e0e0e0",
+            },
+          }}
+          muiTableBodyRowProps={({ row }) => ({
+            sx: {
+              backgroundColor: row.index % 2 === 0 ? "#fafafa" : "white",
+              "&:hover": {
+                backgroundColor: "#f0f0f0",
+              },
+            },
+          })}
+          state={{
+            isLoading: selected === "user" ? isLoading : carpIsLoading,
+          }}
+          muiSkeletonProps={{
+            animation: "wave",
+          }}
+          muiCircularProgressProps={{
+            style: {
+              color: "#4F033D",
+            },
+          }}
+        />
+      )}
+      <DeleteModal
+        isOpen={isOpen}
+        onConfirm={onConfirmDelete}
+        onCancel={closeModal}
+        deletingQuery="user"
+        deletingField={item?.name ?? ""}
+      />
     </DefaultLayout>
   );
 }
