@@ -1,12 +1,11 @@
-import { apiClient } from "@/api/lib/apiClient"
+import { apiClient } from "@/api/lib/apiClient";
 
-
-const sendNotifications=async ()=>{
-    try{
-
-        // const res=apiClient.post()
-    }catch(e){
-       
-        
-    }
-}
+export const sendNotifications = async (payload: {
+  title: string;
+  body: string;
+  tokens: string[];
+  imageUrl: string;
+}) => {
+  const res = await apiClient.post("pushNotification/sendMany", payload);
+  return res.data;
+};

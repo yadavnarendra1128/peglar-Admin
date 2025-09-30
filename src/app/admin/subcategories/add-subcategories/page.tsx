@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/Admin/FormElements/InputGroup";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import { useCreateSubcategory } from "@/hooks/useUsers"; // aapka mutation hook
-import type { CreateSubcategoryDto } from "api/services/base.service";
+import type { CreateSubcategoryDto } from "@/api/services/base.service";
 import {
   MenuItem,
   Select,
@@ -14,6 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useCategories } from "@/hooks/useCategories";
+import showToast from "@/api/lib/showToast";
 
 export default function Page() {
   const [formData, setFormData] = useState<CreateSubcategoryDto>({
@@ -52,9 +53,11 @@ export default function Page() {
       });
 
       setSuccessMsg("Subcategory created successfully");
+      showToast(true, "Subcategory created successfully");
       setFormData({ name: "", categoryId: "" });
     } catch (err: any) {
       setErrorMsg(err?.message || "Failed to create subcategory");
+      showToast(false, "Failed to create subcategory");
     }
   };
 
@@ -75,7 +78,7 @@ export default function Page() {
                   type="text"
                   placeholder="e.g., Quantum Physics"
                   value={formData.name}
-                  onChange={(value: string) => handleChange("name", value)}
+                  onChange={(value: any) => handleChange("name", value)}
                   customClasses="mb-4.5"
                   required
                 />

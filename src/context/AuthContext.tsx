@@ -1,8 +1,8 @@
 'use client'
 import { User } from "@/types/user";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getProfileApi } from "../../api/services/base.service";
-import showToast from "../../api/lib/showToast";
+import { getProfileApi } from "@/api/services/base.service";
+import showToast from "@/api/lib/showToast";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const res = await getProfileApi()
                 setUser(res)
             }catch(err){
-                // router.push('/signin')
                 showToast(false,'User not found.')
             }finally{
                 setLoading(false)

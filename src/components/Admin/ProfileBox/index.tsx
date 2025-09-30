@@ -6,7 +6,9 @@ import { User } from "@/types/user";
 import { useParams } from "next/navigation";
 import { getUserById } from "../../../../api/services/base.service";
 import showToast from "../../../../api/lib/showToast";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { error } from "console";
+import { profileVerification } from "@/api/services/base.service";
 
 const ProfileBox = () => {
   const params = useParams()
@@ -55,7 +57,15 @@ const ProfileBox = () => {
       fetchUser()
     }
   },[id])
-
+ const verificationMutation = useMutation({
+   mutationFn: (id: string) => profileVerification(id),
+   onSuccess: (data) => {
+     showToast(true, "Profile verified successfully");
+   },
+   onError: (error) => {
+     showToast(false, "Error in verification:" + error);
+   },
+ });
   return (
     <>
       <div className="overflow-hidden rounded-[10px] pb-8 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
@@ -103,17 +113,13 @@ const ProfileBox = () => {
         <div className="flex flex-col gap-4 mb-5" style={{ margin: "0 20px" }}>
           {user?.phone && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                Mobile:
-              </span>{" "}
+              <span className="font-medium text-gray-700 ">Mobile:</span>{" "}
               {user?.phone}
             </p>
           )}
 
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 ">
-              User Type:
-            </span>{" "}
+            <span className="font-medium text-gray-700 ">User Type:</span>{" "}
             <span
               className="w-1/2 capitalize"
               style={{ width: "50%", textAlign: "right" }}
@@ -122,20 +128,27 @@ const ProfileBox = () => {
             </span>
           </p>
 
-          {user?.userType=='carpenter' && (
+          {user?.userType == "carpenter" && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                isVerified:
-              </span>{" "}
+              <span className="font-medium text-gray-700 ">isVerified:</span>{" "}
               <span
-              // className="w-1/2 capitalize"
-              style={{ width: "50%", textAlign: "right" }}
-            >
-              {String(user?.isVerified)}
-            </span>
+                // className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
+              >
+                {String(user?.isVerified)}
+              </span>
             </p>
           )}
-    </div>
+          <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
+            <span className="font-medium text-gray-700 ">Wallet:</span>{" "}
+            <span
+              className="w-1/2 capitalize"
+              style={{ width: "50%", textAlign: "right" }}
+            >
+              {user?.wallet_balance}
+            </span>
+          </p>
+        </div>
 
         {/* Checkbox Section */}
         {/* <div className="px-4 py-6">
@@ -180,6 +193,19 @@ const ProfileBox = () => {
         </div>
       */}
 
+        {!user?.isVerified && (
+          <div className="px-4 py-6 w-full">
+            <button
+              onClick={() => verificationMutation.mutate(id)}
+              disabled={verificationMutation.isPending}
+              className="disabled:bg-primary/70 mt-3 flex w-[50%] sm:w-full lg:w-[30%] xl:w-[30%] md:w-[30%] justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit"
+            >
+              {verificationMutation.isPending
+                ? "Verifying......"
+                : "Profile verify"}
+            </button>
+          </div>
+        )}
         {/* Submit Button */}
         {/* <div className="px-4 py-6">
           <button

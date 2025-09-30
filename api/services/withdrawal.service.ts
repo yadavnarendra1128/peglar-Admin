@@ -5,7 +5,7 @@ import { getUserById } from "./base.service";
 export const getAllWithdrawals = async () => {
   const res = await apiClient.get("/withdrawal/withdrawals");
   console.log(res.data, "withdrawals data");
-  return res.data;
+  return res.data.data;
 };
 
 export const sendPayment = async (

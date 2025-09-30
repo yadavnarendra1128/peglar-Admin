@@ -12,7 +12,7 @@ import {
   type MRT_Row,
 } from "material-react-table";
 import { Box,Typography } from '@mui/material'
-import { handleProductVariants, VariantType } from '../../../../api/services/product.service'
+import { handleProductVariants, VariantType } from '@/api/services/product.service'
 
 export default function page() {
 

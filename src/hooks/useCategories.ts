@@ -6,6 +6,7 @@ type Category = {
   name: string;
   createdAt: string;
   updatedAt: string;
+  is_active: boolean;
 };
 
 export const useCategories = () => {

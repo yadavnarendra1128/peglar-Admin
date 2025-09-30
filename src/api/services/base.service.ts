@@ -1,5 +1,5 @@
 import { User } from "@/types/user";
-import { apiClient } from "../lib/apiClient";
+import { apiClient,basePath } from "../../../api/lib/apiClient";
 import axios from 'axios'
 
 export type Product = {
@@ -25,15 +25,15 @@ export type Product = {
   subcategoryId: string;
   createdAt: string;
   updatedAt: string;
+  media: MediaType[]
 };
 
 export type ProductType = {
   name: string;
   model_no: string;
   base_price:number;
-  qr_count: number;
+  finish: string;
   description:string;
-  reward_amount: number;
   categoryId: string;
   subcategoryId: string;
   media:MediaType[]
@@ -75,6 +75,8 @@ export type BackendUser = {
   lifetime_earning: string;
   createdAt: string;
   updatedAt: string;
+  fcm?: string;
+  is_active: boolean;
 };
 
 // ============ User ============ 
@@ -329,11 +331,12 @@ export const getProfileApi = async (): Promise<User> => {
 // ------ upload ---------------
 export const uploadFile = async (file:File, section:string):Promise<MediaType> => {
   try {
+    const basePath =      process.env.NEXT_PUBLIC_API_BASE_PATH || "http://31.97.61.201";
     const formData = new FormData();
     formData.append("section", section);
     formData.append("media", file);
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_PATH || 'http://31.97.61.201' + '/api/upload'}`,
+      `${basePath + '/api/upload'}`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -358,4 +361,14 @@ export const deleteFile = async (body:{
     console.log(err.response.data?.error);
     throw "Failed to upload image.";
   }
+};
+
+export const profileVerification = async (userId: string) => {
+  const payload = {
+    userId,
+    title: "Updates",
+    message: "Profile Verified",
+  };
+  const res = await apiClient.post("/notifications", payload);
+  return res.data.data;
 };

@@ -16,13 +16,21 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchCategory, getSubcategories, Subcategory, updateSubcategory } from "../../../../../api/services/base.service";
+import {
+  deleteSubcategory,
+  updateSubcategory,
+} from "@/api/services/subcategory.service";
+import { useCategories } from "@/hooks/useCategories";
+import { Subcategory, useSubcategories } from "@/hooks/useSubcategories";
+import showToast from "@/api/lib/showToast";
+import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
+import { useDeleteModal } from "@/context/DeleteModalContext";
 
 // Define the Category interface locally
-interface Category {
-  id: string;
-  name: string;
-}
+// interface Category {
+//   id: string;
+//   name: string;
+// }
 
 type TableRow = {
   subcategoryId: string;
@@ -35,29 +43,23 @@ type TableRow = {
 export default function SubcategoriesPage() {
   const qc = useQueryClient();
 
+  const { item, isOpen, openModal, closeModal } = useDeleteModal();
+
   // Fetch subcategories
   const {
     data: subcategories = [],
     isLoading: subsLoading,
     isError: subsError,
     error: subsErrObj,
-  } = useQuery<Subcategory[]>({
-    queryKey: ["subcategories"],
-    queryFn: getSubcategories,
-    staleTime: 60 * 1000,
-  });
+  } = useSubcategories();
 
-  // Fetch categories
+  // // Fetch categories
   const {
     data: categories = [],
     isLoading: catsLoading,
     isError: catsError,
     error: catsErrObj,
-  } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchCategory,
-    staleTime: 5 * 60 * 1000,
-  });
+  } = useCategories();
 
   // Local hide state for "delete" action
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
@@ -74,9 +76,14 @@ export default function SubcategoriesPage() {
       qc.invalidateQueries({ queryKey: ["subcategories"] });
       setEditId(null);
       setEditValue("");
+      showToast(true, "name updated successfully");
+    },
+    onError: () => {
+      showToast(false, "fail to update name try again");
     },
   });
 
+  // Category map
   // Category map
   const categoryMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -87,22 +94,34 @@ export default function SubcategoriesPage() {
   // Table data
   const tableData: TableRow[] = useMemo(() => {
     return subcategories
-      .filter((s) => !hiddenIds.has(s.id))
-      .map((s) => ({
+      .map((s: Subcategory) => ({
         subcategoryId: s.id,
         subcategoryName: s.name,
         categoryId: s.categoryId,
         categoryName: categoryMap.get(s.categoryId) ?? "-",
         createdAt: new Date(s.createdAt).toLocaleString(),
-      }));
-  }, [subcategories, categoryMap, hiddenIds]);
+      }))
+      .filter((s: Subcategory) => categoryMap.has(s.categoryId));
+  }, [subcategories, categoryMap]);
+
+  //   // Table data
+  // const tableData: TableRow[] = useMemo(() => {
+  //   return subcategories
+  //     .map((s:Subcategory) => ({
+  //       subcategoryId: s.id,
+  //       subcategoryName: s.name,
+  //       categoryId: s.categoryId,
+  //       categoryName: s.Category?.name,
+  //       createdAt: new Date(s.createdAt).toLocaleString(),
+  //     }));
+  // }, [subcategories, hiddenIds]);
 
   const columns = useMemo<MRT_ColumnDef<TableRow>[]>(() => {
     return [
       {
         id: "srno",
         header: "Sr. No.",
-        size: 70,
+        size: 1,
         enableSorting: false,
         enableColumnActions: false,
         Cell: ({ row, table }) => {
@@ -114,7 +133,7 @@ export default function SubcategoriesPage() {
       {
         accessorKey: "subcategoryName",
         header: "Subcategory Name",
-        size: 240,
+        size: 1,
         Cell: ({ row }) => {
           // If current row is in edit mode → show input
           if (editId === row.original.subcategoryId) {
@@ -130,13 +149,13 @@ export default function SubcategoriesPage() {
           return row.original.subcategoryName;
         },
       },
-      { accessorKey: "categoryId", header: "Category ID", size: 260 },
-      { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
-      { accessorKey: "createdAt", header: "Created At", size: 200 },
+      // { accessorKey: "categoryId", header: "Category ID", size: 260 },
+      // { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
+      // { accessorKey: "createdAt", header: "Created At", size: 200 },
       {
         id: "actions",
         header: "Actions",
-        size: 150,
+        size: 1,
         Cell: ({ row }) => {
           const id = row.original.subcategoryId;
           const isEditing = editId === id;
@@ -184,7 +203,7 @@ export default function SubcategoriesPage() {
                 color="error"
                 size="small"
                 title="Hide"
-                onClick={() => handleHide(row)}
+                onClick={() => openModal(row.original as any)}
               >
                 <DeleteIcon fontSize="small" />
               </IconButton>
@@ -195,16 +214,36 @@ export default function SubcategoriesPage() {
     ];
   }, [editId, editValue, updateMutation.isPending]);
 
-  const handleHide = (row: MRT_Row<TableRow>) => {
-    const id = row.original.subcategoryId;
-    setHiddenIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+  // const handleHide = (row: MRT_Row<TableRow>) => {
+
+  //   const id = row.original.subcategoryId;
+  //   setHiddenIds((prev) => {
+  //     const next = new Set(prev);
+  //     next.add(id);
+  //     return next;
+  //   });
+  // };
+
+  const onConfirmDelete = async () => {
+    deleteMutation.mutate({ id: item.subcategoryId });
   };
 
-  if (subsLoading || catsLoading) {
+  // Mutation for update
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteSubcategory(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      showToast(true, `deleted successfully`);
+    },
+    onError: (err) => {
+      showToast(
+        false,
+        `Failed to delete user ${item?.subcategoryName}. \n ${err}`
+      );
+    },
+  });
+
+  if (subsLoading) {
     return (
       <DefaultLayout>
         <Breadcrumb pageName="Subcategories" />
@@ -213,7 +252,7 @@ export default function SubcategoriesPage() {
     );
   }
 
-  if (subsError || catsError) {
+  if (subsError || catsErrObj) {
     const message =
       (subsErrObj as Error)?.message ||
       (catsErrObj as Error)?.message ||
@@ -234,6 +273,29 @@ export default function SubcategoriesPage() {
         data={tableData}
         initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
         enableColumnResizing
+        state={{
+          isLoading: subsLoading,
+        }}
+        muiSkeletonProps={{
+          animation: "wave",
+        }}
+        muiCircularProgressProps={{
+          style: {
+            color: "#4F033D",
+          },
+        }}
+        defaultColumn={{
+          size: 1, // flex distribution
+          muiTableHeadCellProps: { sx: { flex: 1 } },
+          muiTableBodyCellProps: { sx: { flex: 1 } },
+        }}
+      />
+      <DeleteModal
+        isOpen={isOpen}
+        onConfirm={onConfirmDelete}
+        onCancel={closeModal}
+        deletingQuery="subcategories"
+        deletingField={item?.subcategoryName ?? ""}
       />
     </DefaultLayout>
   );

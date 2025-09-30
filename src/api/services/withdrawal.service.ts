@@ -20,7 +20,7 @@ export const sendPayment = async (
     }
     if (upiId !== user.upiDetails?.upiId) throw new Error("user not found");
 
-    console.log('got here',user.name,upiId)
+    console.log("got here", user.name, upiId);
     const payload = {
       amount: 1,
       payment_mode: "UPI",
@@ -29,9 +29,9 @@ export const sendPayment = async (
       upi: upiId,
     };
     console.log("SUCCESSS", payload);
-    const payoutResponse = await apiClient.post("/payout", payload)
-    console.log(payoutResponse)
-    return payoutResponse
+    // const payoutResponse = await apiClient.post("/payout", payload)
+    // console.log(payoutResponse)
+    // return payoutResponse
   } catch (e) {
     console.log(e);
   }

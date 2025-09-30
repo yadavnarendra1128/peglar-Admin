@@ -70,7 +70,7 @@ export const updateProduct = async (productId: string, payload: any) => {
 export const deleteProduct = async (id: string) => {
   try {
     await apiClient.delete(`/product/deleteProduct/${id}`);
-  } catch (e:any) {
+  } catch (e: any) {
     console.log(e);
     throw new Error(e.message);
   }
@@ -97,16 +97,19 @@ export const getVariantsByProductId = async (id: string) => {
   }
 };
 
-export const handleProductVariants = async (productId: string,variants: VariantType[]) => {
+export const handleProductVariants = async (
+  productId: string,
+  variants: VariantType[]
+) => {
   try {
-    const res = await apiClient.post(`/variants/handleVariants/${productId}`,variants);
-    console.log(res)
-    return res.data.data
+    const res = await apiClient.post(
+      `/variants/handleVariants/${productId}`,
+      variants
+    );
+    console.log(res);
+    return res.data.data;
   } catch (e: any) {
     console.log(e);
     throw new Error(e.message);
   }
 };
-
-
-

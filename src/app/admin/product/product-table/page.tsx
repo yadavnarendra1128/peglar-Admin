@@ -13,7 +13,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useProducts } from "@/hooks/useProducts";
 import { useRouter } from "next/navigation";
 import { useDeleteModal } from "@/context/DeleteModalContext";
-import showToast from "../../../../../api/lib/showToast";
+import showToast from "@/api/lib/showToast";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import { deleteProduct, Product } from "@/api/services/product.service";
 

@@ -561,7 +561,7 @@ video {
 
 @layer components {
     .curlBtn {
-        @apply relative block w-[120px] h-9 mx-auto py-[1.18rem] bg-customPink border border-none border-gray-300 text-sm text-white text-center transition-all duration-250 ease-out;
+        @apply relative block w-[120px] h-10 mx-auto py-[1.18rem] bg-customPink border border-none border-gray-300 text-sm text-white text-center transition-all duration-250 ease-out;
     }
 
     .curlBtnPaper {
@@ -617,7 +617,7 @@ video {
     /* Small screen styles */
     @media (max-width: 640px) {
         .curlBtn {
-            @apply w-[100px] h-9 text-xs py-2;
+            @apply w-[100px] h-10 text-xs py-2;
         }
     }
 }
