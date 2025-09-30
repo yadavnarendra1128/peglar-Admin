@@ -299,7 +299,7 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
 
 export const getProfileApi = async (): Promise<User> => {
   try {
-    const res = await apiClient.get("/users/me",{withCredentials:true});
+    const res = await apiClient.get("/users/me");
     return res.data.user;
   } catch (err: any) {
     console.log(err.response.data?.error);

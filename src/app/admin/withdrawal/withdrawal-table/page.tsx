@@ -6,15 +6,17 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
+import { useQuery } from "@tanstack/react-query";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import useWithdrawals from "@/hooks/useWithdrawal";
-import { sendPayment } from "@/api/services/withdrawal.service";
-import showToast from "@/api/lib/showToast";
+import { CircularProgress, Typography } from "@mui/material";
+
+import { getAllWithdrawals } from "@/api/services/withdrawal.service";
+import { sendPayment } from "../../../../../api/services/withdrawal.service";
+import showToast from "../../../../../api/lib/showToast";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
-import { getProfile } from "@/api/services/base.service";
-
+import useWithdrawals from "@/hooks/useWithdrawal";
 
 type Withdrawal = {
   id: string;
@@ -32,6 +34,11 @@ export default function WithdrawalTable() {
 
   const onConfirmDelete = async () => {
     try {
+      // await deleteUser(item.id)
+      // setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
+      //   if(!val)return []
+      //   else return val
+      // })
       showToast(true, `User ${item.name} deleted successfully`);
     } catch (err) {
       showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
@@ -80,7 +87,7 @@ export default function WithdrawalTable() {
               border: "border-yellow-200",
               icon: "⏳",
             },
-            success: {
+            approved: {
               bg: "bg-green-50",
               text: "text-green-800",
               border: "border-green-200",
@@ -156,7 +163,7 @@ export default function WithdrawalTable() {
         size: 100,
         enableSorting: false,
         Cell: ({ row }) => (
-          <div className="flex justify-center gap-x-3 ">
+          <div className="flex justify-center gap-x-3">
             <button
               title="payment"
               className="p-2 disabled:text-red-600 text-green-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
@@ -186,15 +193,11 @@ export default function WithdrawalTable() {
                 <circle cx="12" cy="12" r="2" />
               </svg>
             </button>
-            {/* <button
+            <button
               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
               title="Delete"
-              onClick={() => {
-
+              onClick={() =>
                 console.log("Delete clicked for:", row.original.id)
-                openModal(row.original as any)
-              }
-
               }
             >
               <svg
@@ -219,14 +222,12 @@ export default function WithdrawalTable() {
                   <path d="M864 256H736v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zm-504-72h304v72H360v-72zm371.3 656H292.7l-24.2-512h487l-24.2 512z"></path>{" "}
                 </g>
               </svg>
-
-            </button> */}
-
+            </button>
           </div>
         ),
       },
     ],
-    [WithdrawalTable,isPaymentLoading]
+    []
   );
 
   // Normalize data structure
@@ -252,13 +253,31 @@ export default function WithdrawalTable() {
     } catch (e: any) {
       showToast(false, e.message);
     } finally {
-      setIsPaymentLoading(false)
+      setIsPaymentLoading(false);
     }
   };
 
   // Early return for mounting state
   if (!mounted) return <div />;
 
+  // Loading state
+  // if (isLoading) {
+  //   return (
+  //     <DefaultLayout>
+  //       <div
+  //         style={{
+  //           padding: 24,
+  //           display: "flex",
+  //           alignItems: "center",
+  //           gap: 12,
+  //         }}
+  //       >
+  //         <CircularProgress size={24} />
+  //         <Typography>Loading withdrawals</Typography>
+  //       </div>
+  //     </DefaultLayout>
+  //   );
+  // }
 
   // Error state
   if (error) {
@@ -311,10 +330,10 @@ export default function WithdrawalTable() {
           </div>
           <div className="bg-white sm:p-4 lg:p-6 rounded-lg shadow-sm border p-2">
             <div className="text-xs sm:text-sm text-gray-600 mb-1 !font-poppins">
-              success
+              Approved
             </div>
             <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 !font-poppins">
-              {tableData.filter((item) => item.status === "success").length}
+              {tableData.filter((item) => item.status === "approved").length}
             </div>
           </div>
           <div className="bg-white sm:p-4 lg:p-6 rounded-lg shadow-sm border p-2">
@@ -374,12 +393,8 @@ export default function WithdrawalTable() {
                 "& .MuiTableRow-root:hover": {
                   backgroundColor: "#f9fafb",
                 },
-                
               },
-                
             }}
-
-            
             muiPaginationProps={{
               shape: "rounded",
               variant: "outlined",

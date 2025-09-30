@@ -52,9 +52,3 @@ export const getAllProductQr = async () => {
   const res = await apiClient.get("/productQr/getAllQr");
   return res.data.data;
 };
-
-export const updateQrReward=async (payload:{})=>{
-  const res=await apiClient.patch("/productQr/updateQrReward/",payload)
-  console.log("DDDDDDDDDDDDDDDDDDDDDDD",res)
-  return res.data
-}

@@ -17,12 +17,6 @@ import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModa
 import showToast from "../../../../api/lib/showToast";
 import { BackendUser, deleteUser } from "@/api/services/base.service";
 import { formatDateTime } from "@/utils/formatDateTime";
-import Notfication from "@/components/Admin/users/sendNotify";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/api/lib/apiClient";
-import { sendNotifications } from "@/api/services/notify.service";
-import NotficationModal from "@/components/Admin/users/sendNotify";
-import NotificationModal from "@/components/Admin/users/sendNotify";
 
 type TableUser = {
   id: string;
@@ -36,35 +30,26 @@ type TableUser = {
   lifetime_earning: string;
   createdAt: string;
   profileImg?: string | null;
-  fcm?: string | null
 };
 
 export default function UserTable() {
-  const qc = useQueryClient()
   const router = useRouter();
-  const [rowSelection, setRowSelection] = useState({})
-  const [isUpdate, setIsUpdate] = useState(false)
   const { data, isLoading, isError, error } = useUsers();
   const { data:carpenterData, isLoading:carpIsLoading, isError:carpIsError, error:carpError } = useCarpenters();
   const {item,isOpen,openModal,closeModal}=useDeleteModal()
   const [users,setUsers]=useState<BackendUser[]>()
   const [carps, setCarps] = useState<BackendUser[]>();
   const [selected,setSelected]=useState<'user'|'carpenter'>('user')
-  const [formData, setFormData] = useState({
-    body: "", title: "",
-    imageUrl: ""
-  })
 
-  const onConfirmDelete = async () => {
-    try {
+  const onConfirmDelete=async()=>{
+    try{
       await deleteUser(item.id)
-      setUsers((p) => {
-        const val = p ? p?.filter((e) => e.id.toString() !== item.id) : []
-        if (!val) return []
+      setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
+        if(!val)return []
         else return val
       })
-      showToast(true, `User ${item.name} deleted successfully`)
-    } catch (err) {
+      showToast(true,`User ${item.name} deleted successfully`)
+    }catch(err){
       showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
     }
   }
@@ -74,7 +59,7 @@ export default function UserTable() {
     openModal(row.original as any)
   };
 
-  const handleView = (row: MRT_Row<TableUser>) => {
+  const handleView = (row: MRT_Row<TableUser>)=>{
     console.log("View clicked for:", row.original);
     router.push(`/admin/user/${row.original.id}`)
   }
@@ -153,7 +138,7 @@ export default function UserTable() {
               onClick={() => handleDelete(row)}
               title="Delete User"
               style={{
-                background: "#4F9DFF",
+                background: "#ff4d4d",
                 color: "white",
                 padding: "4px 8px",
                 borderRadius: "4px",
@@ -191,66 +176,6 @@ export default function UserTable() {
     setCarps(carpenterData)
   },[data,carpenterData])
 
-  useEffect(() => {
-    if (!Object.keys(rowSelection).length)
-      return
-
-    // const fcmList=UserTable.filter((x,index:number)=>{
-    //   if(index===id[index]){
-    //     return x
-    //   }
-
-
-    console.log(rowSelection, Object.keys(rowSelection).length)
-
-  }, [rowSelection])
-
-  const sendMessage = async () => {
-    if (!Object.keys(rowSelection).length)
-      throw new Error("please select user" + Object.keys(rowSelection));
-
-    if ((!formData.body) && (!formData.title)) {
-      throw new Error("please  enter information properly");
-    }
-    const token: string[] = []
-    const id = (Object.keys(rowSelection)).map(x => parseInt(x))
-    console.log(rowSelection)
-    for (let r = 0; r < tableData.length; r++) {
-      const dataIndex = id[r];
-      const fcmToken = tableData[dataIndex]?.fcm;
-      // console.log("DDDD", fcmToken)
-      if (fcmToken) token.push(fcmToken);
-    }
-
-    const apiPayload = {
-      ...formData,
-      tokens: token,
-    };
-    console.log(apiPayload)
-
-    notfiyMutation.mutate(apiPayload)
-  }
-
-
-  const notfiyMutation = useMutation({
-    mutationFn: (payload: {
-      title: string;
-      body: string;
-      tokens: string[];
-      imageUrl: string
-    }) => sendNotifications(payload)
-    ,
-    onSuccess: (data, variables) => {
-      qc.invalidateQueries({ queryKey: ["notifcation"] });
-      setIsUpdate(false)
-      console.log(data)
-      showToast(true, "notification sent successfully")
-    },
-    onError: (error) => {
-      console.error('notifcation failed:', error)
-      showToast(false, error.message)
-    },
-  });
   return (
     <DefaultLayout>
       {/* Page header with breadcrumb navigation */}
@@ -321,7 +246,6 @@ export default function UserTable() {
           })}
           state={{
             isLoading: selected === "user" ? isLoading : carpIsLoading,
-            rowSelection,
           }}
           muiSkeletonProps={{
             animation: "wave",
@@ -330,24 +254,6 @@ export default function UserTable() {
             style: {
               color: "#4F033D",
             },
-          }}
-          enableMultiRowSelection={true}
-          enableRowSelection={true}
-          onRowSelectionChange={(updater) => {
-            setRowSelection(updater);
-          }}
-          renderTopToolbarCustomActions={() => {
-            return Object.keys(rowSelection).length ? (
-              <button
-                className="bg-blue-600 text-white rounded-lg p-3 hover:scale-95 transition-all duration-700 "
-                onClick={() => {
-                  //send notfication
-                  setIsUpdate(true);
-                }}
-              >
-                send notification
-              </button>
-            ) : null;
           }}
         />
       )}
@@ -358,87 +264,6 @@ export default function UserTable() {
         deletingQuery="user"
         deletingField={item?.name ?? ""}
       />
-      {/* {isError ? (
-        // Error state
-        <Typography color="error" sx={{ p: 2 }}>
-          Failed to load users: {error?.message}
-        </Typography>
-      ) : (
-        // Data table
-        <MaterialReactTable
-          columns={columns}
-          data={tableData}
-          initialState={{
-            pagination: { pageSize: 5, pageIndex: 0 },
-          }}
-          enableColumnResizing
-          muiTableProps={{
-            sx: {
-              border: "1px solid #ccc",
-            },
-          }}
-          muiTableHeadCellProps={{
-            sx: {
-              backgroundColor: "#f5f5f5",
-              fontWeight: "bold",
-              borderBottom: "2px solid #ccc",
-            },
-          }}
-          muiTableBodyCellProps={{
-            sx: {
-              borderBottom: "1px solid #e0e0e0",
-            },
-          }}
-          muiTableBodyRowProps={({ row }) => ({
-            sx: {
-              backgroundColor: row.index % 2 === 0 ? "#fafafa" : "white",
-              "&:hover": {
-                backgroundColor: "#f0f0f0",
-              },
-            },
-          })}
-          state={{
-            isLoading: isLoading,
-            rowSelection,
-          }}
-          muiSkeletonProps={{
-            animation: "wave",
-          }}
-          muiCircularProgressProps={{
-            style: {
-              color: "#4F033D",
-            },
-          }}
-          enableMultiRowSelection={true}
-          // selectAllMode="all
-          enableRowSelection={true}
-          onRowSelectionChange={(updater) => {
-            setRowSelection(updater);
-          }}
-        />
-      )} */}
-      <NotificationModal
-        formData={formData}
-        setFormData={setFormData}
-        isOpen={isUpdate}
-        onCancel={() => {
-          setIsUpdate(false);
-          setRowSelection({});
-          setFormData({
-            body: "",
-            title: "",
-            imageUrl: "",
-          });
-        }}
-        onConfirm={() => sendMessage()}
-      />
-      {/* <DeleteModal
-        isOpen={isOpen}
-        onConfirm={onConfirmDelete}
-        onCancel={closeModal}
-        deletingQuery="user"
-        deletingField={item?.name ?? ""}
-      /> */}
     </DefaultLayout>
   );
 }

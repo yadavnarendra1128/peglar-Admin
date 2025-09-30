@@ -10,17 +10,17 @@ export type Product = {
   qr_count: number;
   reward_amount: number;
   Category: {
-    id: string;
-    name: {
-      en: string;
-      hi: string;
-      kn: string
-    }
-  };
+  id:string;
+  name: {
+    en:string;
+    hi:string;
+    kn:string
+  }
+};
   Subcategory: {
-    id: string;
-    name: string;
-  };
+  id: string;
+  name: string;
+};
   categoryId: string;
   subcategoryId: string;
   createdAt: string;
@@ -30,13 +30,13 @@ export type Product = {
 export type ProductType = {
   name: string;
   model_no: string;
-  base_price: number;
+  base_price:number;
   qr_count: number;
-  description: string;
+  description:string;
   reward_amount: number;
   categoryId: string;
   subcategoryId: string;
-  media: MediaType[]
+  media:MediaType[]
 };
 
 export type MediaType = {
@@ -51,15 +51,15 @@ export const getAllWithdrawals = async () => {
   return res.data;
 };
 
-// export const createCategory = async (data: any) => {
-//   const response = await apiClient.post("categories", data);
-//   return response.data; // <-- Added .data to return the actual data
-// };
+export const createCategory = async (data: any) => {
+  const response = await apiClient.post("categories", data);
+  return response.data; // <-- Added .data to return the actual data
+};
 
-// export const fetchCategory = async () => {
-//   const response = await apiClient.get("categories");
-//   return response.data.data; // <-- Corrected: returns the data array
-// };
+export const fetchCategory = async () => {
+  const response = await apiClient.get("categories");
+  return response.data.data; // <-- Corrected: returns the data array
+};
 
 // ============ Users ============
 export type BackendUser = {
@@ -75,41 +75,29 @@ export type BackendUser = {
   lifetime_earning: string;
   createdAt: string;
   updatedAt: string;
-  fcm?: string;
-  is_active:boolean
 };
 
 // ============ User ============ 
 
-export const getAllCarpenters = async (): Promise<BackendUser[]> => {
-  try {
-    const res = await apiClient.get("/users/all-carpenter");
-    return res.data.data;
-  } catch (e: any) {
-    console.log(e);
-    throw new Error(e.message);
-  }
-};
-
 export const getAllUsers = async (): Promise<BackendUser[]> => {
   try {
-    const res = await apiClient.get("/users");
-    return res.data.data;
-  } catch (e: any) {
-    console.log(e);
-    throw new Error(e.message);
-  }
+  const res = await apiClient.get("/users");
+  return res.data.data;
+}catch(e:any){
+ console.log(e);
+ throw new Error(e.message);
+   }
 };
 
-export const getProfile = async () => {
-  try {
-    const res = await apiClient.get(`/users/me`);
-    console.log(res, 'prof')
-    return res.data.user
-  } catch (e: any) {
-    console.log(e);
-    throw new Error(e.message);
-  }
+export const getProfile = async ()=>{
+   try {
+     const res = await apiClient.get(`/users/me`);
+     console.log(res,'prof')
+     return res.data.user
+   } catch (e:any) {
+     console.log(e);
+     throw new Error(e.message);
+   }
 }
 
 export const getUserById = async (id:string): Promise<User> => {
@@ -122,10 +110,10 @@ export const getUserById = async (id:string): Promise<User> => {
    }
 };
 
-export const deleteUser = async (id: string) => {
-  try {
+export const deleteUser = async (id:string)=>{
+  try{
     await apiClient.delete(`/users/${id}`)
-  } catch (e: any) {
+  }catch(e:any){
     console.log(e);
     throw new Error(e.message)
   }
@@ -164,13 +152,13 @@ export const getAllProducts = async (): Promise<Product[]> => {
 export const deleteProduct = async (id: string) => {
   try {
     await apiClient.delete(`/product/deleteProduct/${id}`);
-  } catch (e: any) {
+  } catch (e:any) {
     console.log(e);
     throw new Error(e.message);
   }
 };
 
-export const getVariantsByProductId = async (id: string) => {
+export const getVariantsByProductId = async (id:string)=>{
   try {
     const res = await apiClient.get(`/variants/product/${id}`);
     return res.data
@@ -180,14 +168,14 @@ export const getVariantsByProductId = async (id: string) => {
   }
 }
 
-export const createVariant = async (data: any) => {
-  try {
-    const res = await apiClient.post(`/variants`, data);
-    return res.data;
-  } catch (e: any) {
-    console.log(e);
-    throw new Error(e.message);
-  }
+export const createVariant = async (data:any)=>{
+   try {
+     const res = await apiClient.post(`/variants`,data);
+     return res.data;
+   } catch (e: any) {
+     console.log(e);
+     throw new Error(e.message);
+   }
 }
 
 // ============ Subcategories ============
@@ -317,11 +305,10 @@ export type LoginResponse = {
 };
 
 export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
-  try {
-    const res = await apiClient.post("/users/login", payload);
-    return res.data;
-    console.log(res)
-  } catch (err: any) {
+  try{
+  const res = await apiClient.post("/users/login", payload);
+  return res.data;
+  }catch(err: any){
     console.log(err.response.data?.error);
     throw (
       err.response.data?.error || err?.message || "Invalid credentials"
@@ -331,16 +318,16 @@ export const loginApi = async (payload: LoginDto): Promise<LoginResponse> => {
 
 export const getProfileApi = async (): Promise<User> => {
   try {
-    const res = await apiClient.get("/users/me", { withCredentials: true });
+    const res = await apiClient.get("/users/me");
     return res.data.user;
   } catch (err: any) {
     console.log(err.response.data?.error);
-    throw 'User not found.'
+    throw 'User not found.' 
   }
 };
 
 // ------ upload ---------------
-export const uploadFile = async (file: File, section: string): Promise<MediaType> => {
+export const uploadFile = async (file:File, section:string):Promise<MediaType> => {
   try {
     const formData = new FormData();
     formData.append("section", section);
@@ -359,9 +346,9 @@ export const uploadFile = async (file: File, section: string): Promise<MediaType
   }
 };
 
-export const deleteFile = async (body: {
-  fileName: string
-}): Promise<{ status: string; message: string, fileName: string }> => {
+export const deleteFile = async (body:{
+  fileName : string
+}): Promise<{status:string;message:string,fileName:string}> => {
   try {
     const res = await apiClient.delete(`/upload`, {
       data: body,
@@ -372,13 +359,3 @@ export const deleteFile = async (body: {
     throw "Failed to upload image.";
   }
 };
-
-export const profileVerification = async (userId: string) => {
-  const payload = {
-    userId,
-    "title": "Updates",
-    "message": "Profile Verified"
-  }
-  const res=await apiClient.post("/notifications",payload)
-  return res.data.data
-}

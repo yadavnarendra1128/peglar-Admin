@@ -3,19 +3,18 @@
 import React, { useMemo, useState } from "react";
 
 import {
-  downloadQRExcel,
+   downloadQRExcel,
   generateBulkQRCodes,
   GenerateBulkQRRequest,
 } from "@/api/services/qr.service";
-import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";;
+import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
+import { useProducts } from "@/hooks/useProducts";
+import { Product } from "@/api/services/product.service";
 import InputGroup from "@/components/Admin/FormElements/InputGroup"; // Fixed typo here
 
 import { useMutation } from "@tanstack/react-query";
 
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
-import { useProducts } from "@/hooks/useProducts";
-import { Product } from "@/api/services/product.service";
-import showToast from "@/api/lib/showToast";
 
 interface GeneratedQRData {
   message: string;
@@ -27,7 +26,7 @@ interface GeneratedQRData {
 
 export default function Page() {
   // State to hold generated QR code data after successful API call
-  const { data } = useProducts();
+const { data } = useProducts();
   const [generatedQRData, setGeneratedQRData] =
     useState<GeneratedQRData | null>(null); // Form state with default values
 
@@ -37,17 +36,12 @@ export default function Page() {
     reward_amount: "",
   }); // Dummy product data - ideally loaded from API or props
 
-  const [error, setError] = useState({
-    qrCount: "",
-    reward_amount: "",
-    product: ""
-  })
-  const productOptions = useMemo(() => {
-    if (!data) return [];
-    return data.map((product: Product) => {
-      return { id: product.id, name: product.name };
-    });
-  }, [data]);
+ const productOptions = useMemo(() => {
+   if (!data) return [];
+   return data.map((product: Product) => {
+     return { id: product.id, name: product.name };
+   });
+ }, [data]);
 
   const generateQRMutation = useMutation<
     GeneratedQRData,
@@ -59,42 +53,28 @@ export default function Page() {
 
     onSuccess: (data) => {
       console.log("QR codes generated successfully:", data);
+
       setGeneratedQRData(data);
-      setFormData({
-        productId: "",
-        qrCount: "",
-        reward_amount: ""
-      });
-      showToast(true, "QR codes generated successfully")
     },
 
     onError: (error) => {
       console.error("Error generating QR codes:", error.message); // You might want to show a toast notification or UI feedback here
-      showToast(false, error.message)
-       setFormData({
-        productId: "",
-        qrCount: "",
-        reward_amount: ""
-      });
     },
   }); // Handle form input changes generically
 
   const handleChange = (field: string, value: string | number) => {
-    console.log(field, value)
     setFormData((prev) => ({ ...prev, [field]: value }));
   }; // Form submission handler
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-     setGeneratedQRData(null);
+
     const selectedProduct = productOptions.find(
       (product) => product.id === formData.productId
     );
-    // console.log(selectedProduct,productOptions,formData.productId)
+
     if (!selectedProduct) {
-      setError(pre => ({
-        ...pre, count: "please select valid product"
-      }))
+      alert("Please select a valid product");
 
       return;
     }
@@ -102,27 +82,18 @@ export default function Page() {
     const qrCountNum = parseInt(formData.qrCount);
 
     if (isNaN(qrCountNum) || qrCountNum <= 0) {
-      setError(pre => ({
-        ...pre, qrCount: "please enter a valid QR code count greater than zero"
-      }))
-      // alert("P);
+      alert("Please enter a valid QR code count greater than zero");
+
       return;
     } // Optional: Commented out check for available QR codes; uncomment if desired // if (qrCountNum > selectedProduct.count) { // alert( //  `Cannot generate ${qrCountNum} QR codes. Only ${selectedProduct.count} available for this product.` // ); // return; // }
 
-    if (!formData.reward_amount) {
-      setError(pre => ({
-        ...pre, reward_amount: "please enter a valid amount"
-      }))
-    }
-  
     const apiPayload: GenerateBulkQRRequest = {
       product_id: formData.productId,
-      reward_amount: parseInt(formData.reward_amount),
+    reward_amount: parseInt(formData.reward_amount),
       count: qrCountNum,
     };
 
     generateQRMutation.mutate(apiPayload);
-
   }; // Download generated QR codes Excel file
 
   const handleDownload = async () => {
@@ -139,13 +110,13 @@ export default function Page() {
     setFormData({
       productId: "",
       qrCount: "",
-      reward_amount: ""
+         reward_amount: ""
     });
 
     setGeneratedQRData(null);
-    // handleReset()
+
     generateQRMutation.reset();
-  }
+  };
 
   return (
     <DefaultLayout>
@@ -187,9 +158,6 @@ export default function Page() {
                       </option>
                     ))}
                   </select>
-                  {error.product && (
-                    <p className="text-red-400  my-1text-sm font-medium">{error.product}</p>
-                  )}
                 </div>
 
                 <InputGroup
@@ -199,11 +167,9 @@ export default function Page() {
                   value={formData.qrCount}
                   onChange={(value) => handleChange("qrCount", value)}
                   customClasses="mb-4.5"
-                  required={true}
-                  error={error.qrCount}
-
-
+                  required // disabled={generateQRMutation.isLoading} // min={1}
                 />
+
                 <InputGroup
                   label="Reward Amount"
                   type="number"
@@ -211,10 +177,8 @@ export default function Page() {
                   value={formData.reward_amount}
                   onChange={(value) => handleChange("reward_amount", value)}
                   customClasses="mb-4.5"
-                  required={true} // disabled={generateQRMutation.isLoading} // min={1}
-                  error={error.reward_amount}
+                  required // disabled={generateQRMutation.isLoading} // min={1}
                 />
-
               </div>
             </div>
           </div>
@@ -222,17 +186,15 @@ export default function Page() {
 
         <div className="flex gap-3">
           <button
-
             type="submit"
-            className="hover:bg-primary/70 mt-3 flex flex-1 justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit disabled:opacity-50 disabled:cursor-not-allowed" // disabled={generateQRMutation.isLoading}
-          disabled={generateQRMutation.isPending}
+            className="mt-3 flex flex-1 justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit disabled:opacity-50 disabled:cursor-not-allowed" // disabled={generateQRMutation.isLoading}
           >
             {generateQRMutation.isPending
               ? "Generating QR Codes..."
               : "Generate QR Codes"}
           </button>
 
-          {/* {generatedQRData ? (
+          {generatedQRData ? (
             <button
               type="button"
               onClick={handleReset}
@@ -242,13 +204,13 @@ export default function Page() {
             </button>
           ) : (
             ""
-          )} */}
+          )}
         </div>
       </form>
       {/* Success Message and Download Section */}
       {generatedQRData && (
         <div
-          className="flex flex-col justify-center items-center bg-green-50 border border-green-200 rounded-lg p-6"
+          className="flex flex-col justify-center items-center bg-green-50 border border-green-200 rounded-lg p-6 dark:bg-green-900/20 dark:border-green-800"
           style={{ margin: "40px 0" }}
         >
           <div className="text-center mb-4">
@@ -275,7 +237,7 @@ export default function Page() {
         </div>
       )}
       {/* Error Message */}
-      {/* {generateQRMutation.isError && (
+      {generateQRMutation.isError && (
         <div
           className="flex flex-col justify-center items-center bg-red-50 border border-red-200 rounded-lg p-6 dark:bg-red-900/20 dark:border-red-800"
           style={{ margin: "40px 0" }}
@@ -291,7 +253,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-      )} */}
+      )}
     </DefaultLayout>
   );
 }

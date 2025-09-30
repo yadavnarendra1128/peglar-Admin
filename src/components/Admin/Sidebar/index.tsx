@@ -93,11 +93,6 @@ const menuGroups = [
         label: "Withdrawal Table",
         route: "/admin/withdrawal/withdrawal-table",
       },
-       {
-        icon: <AccountBalanceWalletIcon fontSize="medium" />,
-        label: "Ticket Table",
-        route: "/admin/tickets",
-      },
     ],
   },
 ];

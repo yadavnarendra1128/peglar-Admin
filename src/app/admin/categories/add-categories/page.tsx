@@ -4,9 +4,7 @@ import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/Admin/FormElements/InputGroup";
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import React, { useState } from "react";
-import { createCategory } from "@/api/services/category.service";
-import { useMutation } from "@tanstack/react-query";
-import showToast from "@/api/lib/showToast";
+import { createCategory } from "../../../../../api/services/base.service";
 
 export default function Page() {
   const [formData, setFormData] = useState({
@@ -14,36 +12,35 @@ export default function Page() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [isError,setError]=useState(false)
-  const handleChange = (field: string, value: any) => {
+
+  const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    if(!formData.name){
-      setError(true)
-       setLoading(false);
-      return
-    }
-    setError(false)
-    await createMutation.mutateAsync(formData.name)
-    setLoading(false);
 
-  };
-  const createMutation = useMutation({
-    mutationFn: (name: string) =>
-      createCategory(name),
-    onSuccess: () => {
-      setFormData({ name: "", });
-      showToast(true, "category created successfully")
-    },
-    onError: (err) => {
-      showToast(false, "failed to create category try again")
+    try {
+      setLoading(true);
+
+      // ✅ Call API
+      const res = await createCategory(formData);
+
+      console.log("Category Created:", res.data);
+
+      // Reset form after success
+      setFormData({
+        name: "",
+      });
+
+      alert("Category added successfully!");
+    } catch (err) {
       console.error("Error creating category:", err);
+      alert("Failed to create category");
+    } finally {
+      setLoading(false);
     }
-  })
+  };
 
   return (
     <DefaultLayout>
@@ -67,10 +64,8 @@ export default function Page() {
                   onChange={(value) => handleChange("name", value)}
                   customClasses="mb-4.5"
                   required
-                  error={isError?"name field required":""}
                 />
               </div>
-
             </div>
           </div>
         </div>
