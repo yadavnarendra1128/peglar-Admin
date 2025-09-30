@@ -13,7 +13,6 @@ import { sendPayment } from "@/api/services/withdrawal.service";
 import showToast from "@/api/lib/showToast";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
-import { getProfile } from "@/api/services/base.service";
 
 
 type Withdrawal = {
@@ -27,7 +26,7 @@ type Withdrawal = {
   updatedAt: string;
 };
 
-export default function WithdrawalTable() {
+export default function ticketsTable() {
   const { item, isOpen, openModal, closeModal } = useDeleteModal();
 
   const onConfirmDelete = async () => {
@@ -40,7 +39,6 @@ export default function WithdrawalTable() {
   const [mounted, setMounted] = useState(false);
 
    const { data, isLoading, error } = useWithdrawals();
-   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // Prevent hydration issues
   useEffect(() => setMounted(true), []);
@@ -160,10 +158,9 @@ export default function WithdrawalTable() {
             <button
               title="payment"
               className="p-2 disabled:text-red-600 text-green-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-              disabled={isPaymentLoading}
+            //   disabled={}
               onClick={() => {
-                console.log(row.original);
-                payment(row.original);
+                console.log(row.original)
               }}
             >
               <svg
@@ -226,7 +223,7 @@ export default function WithdrawalTable() {
         ),
       },
     ],
-    [WithdrawalTable,isPaymentLoading]
+    []
   );
 
   // Normalize data structure
@@ -239,22 +236,6 @@ export default function WithdrawalTable() {
     }
   }, [data]);
 
-  //payment api call
-
-  const payment = async (payload: Withdrawal) => {
-    setIsPaymentLoading(true);
-    const { upiId, userId, amount } = payload;
-    //api will call
-    console.log("BBBBBBBBBBBBBBBBBBB", upiId, userId, amount);
-    try {
-      await sendPayment(userId, upiId, parseInt(amount));
-      showToast(true, "Payment done successfully!!!");
-    } catch (e: any) {
-      showToast(false, e.message);
-    } finally {
-      setIsPaymentLoading(false)
-    }
-  };
 
   // Early return for mounting state
   if (!mounted) return <div />;
@@ -289,9 +270,9 @@ export default function WithdrawalTable() {
   return (
     <DefaultLayout>
       <div className="space-y-6">
-        <Breadcrumb pageName="Withdrawals" />
+        <Breadcrumb pageName="Tickets" />
 
-        {/* Responsive Stats Summary Cards */}
+        {/* Responsive Stats Summary Cards
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 !font-poppins">
           <div className="bg-white sm:p-4 lg:p-6 rounded-lg shadow-sm border p-2">
             <div className="text-xs sm:text-sm text-gray-600 mb-1 !font-poppins">
@@ -336,7 +317,7 @@ export default function WithdrawalTable() {
                 .toLocaleString()}
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden !font-poppins">

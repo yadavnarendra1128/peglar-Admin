@@ -26,6 +26,7 @@ type errorDataType = {
   description: string;
   finish: string;
   categoryId: string;
+  
   subcategoryId: string;
   media: string;
 };

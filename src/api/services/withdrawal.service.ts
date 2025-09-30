@@ -22,16 +22,16 @@ export const sendPayment = async (
 
     console.log('got here',user.name,upiId)
     const payload = {
-      amount: 1,
+      amount:1,
       payment_mode: "UPI",
       transcation_note: "testing",
       beneficiaryName: user.name,
       upi: upiId,
     };
     console.log("SUCCESSS", payload);
-    const payoutResponse = await apiClient.post("/payout", payload)
-    console.log(payoutResponse)
-    return payoutResponse
+    // const payoutResponse = await apiClient.post("/payout", payload)
+    // console.log(payoutResponse)
+    // return payoutResponse
   } catch (e) {
     console.log(e);
   }

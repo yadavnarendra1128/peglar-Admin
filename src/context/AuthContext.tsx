@@ -18,16 +18,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading,setLoading]=useState<boolean>(true)
     const router = useRouter()
-    
     useEffect(()=>{
         const fetchProfile=async()=>{
             try{
                 setLoading(true)
                 const res = await getProfileApi()
+                console.log("AAAAAAAAAAAAAAAAA",res)
                 setUser(res)
             }catch(err){
-                // router.push('/signin')
+                // router.push('/admin/signin')
                 showToast(false,'User not found.')
+
             }finally{
                 setLoading(false)
             }
@@ -36,10 +37,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },[])
 
     const logOut = ()=>{
-         Cookies.remove("token");
         setUser(null)
-
-         router.push('/admin/signin')
+         Cookies.remove("token");
+         router.push('/admin')
     }
     
     return (<AuthContext.Provider value={{user,setUser,logOut,loading}}>

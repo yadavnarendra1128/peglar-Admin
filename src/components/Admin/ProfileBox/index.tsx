@@ -6,22 +6,26 @@ import { User } from "@/types/user";
 import { useParams } from "next/navigation";
 import { getUserById } from "../../../../api/services/base.service";
 import showToast from "../../../../api/lib/showToast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { error } from "console";
+import { profileVerification } from "@/api/services/base.service";
 
 
 const ProfileBox = () => {
   const params = useParams()
   const id = params.id as string;
-  const [user,setUser]=useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [tags, setTags] = useState<string[]>([]);
 
   const pages = [
-    "User",
-    "Course",
-    "Blog",
-    "Offer",
-    "Guru's",
-    "Certificate",
-    "Testimonials",
+    // "User",
+    // "Course",
+    // "Blog",
+    // "Offer",
+    // "Guru's",
+    // "Certificate",
+    // "Testimonials",
+    "categories", "subcategories", "withdrawals", "tickets", "product"
   ];
 
   const handleCheckboxChange = (tag: string, isChecked: boolean) => {
@@ -41,20 +45,29 @@ const ProfileBox = () => {
     console.log("Selected Pages:", tags);
   };
 
-  useEffect(()=>{
-    const fetchUser=async()=>{
-      try{
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
         const res = await getUserById(id)
         console.log(res)
         setUser(res)
-      }catch(err){
-        showToast(false,`Failed to view user. \n ${err}`)
+      } catch (err) {
+        showToast(false, `Failed to view user. \n ${err}`)
       }
     }
-    if(id){
+    if (id) {
       fetchUser()
     }
-  },[id])
+  }, [id])
+  const verificationMutation = useMutation({
+    mutationFn: (id: string) => profileVerification(id),
+    onSuccess: (data) => {
+      showToast(true, "Profile verified successfully")
+    },
+    onError: (error) => {
+      showToast(false, "Error in verification:" + error)
+    }
+  })
 
   return (
     <>
@@ -87,9 +100,31 @@ const ProfileBox = () => {
           {(user?.email || user?.name) && (
             <div className="mt-4">
               {user?.name && (
-                <h3 className="mb-1 text-heading-5 font-bold text-dark dark:text-white text-[24px] md:text-[28px]">
-                  {user?.name}
-                </h3>
+                <div className="flex items-center justify-center gap-1">
+                  <h3 className="mb-1 text-heading-5 font-bold text-dark dark:text-white text-[24px] md:text-[28px]">
+                    {user?.name}
+                  </h3>
+                  {user?.isVerified && (
+                    <div>
+                      {" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2bb13a"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        stroke-linejoin="round"
+                        className="lucide lucide-shield-check-icon lucide-shield-check"
+                      >
+                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
               )}
               {user?.email && (
                 <p className="font-medium text-[16px] md:text-[20px]">
@@ -103,17 +138,13 @@ const ProfileBox = () => {
         <div className="flex flex-col gap-4 mb-5" style={{ margin: "0 20px" }}>
           {user?.phone && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                Mobile:
-              </span>{" "}
+              <span className="font-medium text-gray-700 ">Mobile:</span>{" "}
               {user?.phone}
             </p>
           )}
 
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-            <span className="font-medium text-gray-700 ">
-              User Type:
-            </span>{" "}
+            <span className="font-medium text-gray-700 ">User Type:</span>{" "}
             <span
               className="w-1/2 capitalize"
               style={{ width: "50%", textAlign: "right" }}
@@ -122,20 +153,28 @@ const ProfileBox = () => {
             </span>
           </p>
 
-          {user?.userType=='carpenter' && (
+          {user?.userType == "carpenter" && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">
-                isVerified:
-              </span>{" "}
+              <span className="font-medium text-gray-700 ">isVerified:</span>{" "}
               <span
-              // className="w-1/2 capitalize"
-              style={{ width: "50%", textAlign: "right" }}
-            >
-              {String(user?.isVerified)}
-            </span>
+                // className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
+              >
+                {String(user?.isVerified)}
+              </span>
             </p>
           )}
-    </div>
+
+          <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
+            <span className="font-medium text-gray-700 ">Wallet:</span>{" "}
+            <span
+              className="w-1/2 capitalize"
+              style={{ width: "50%", textAlign: "right" }}
+            >
+              {user?.wallet_balance}
+            </span>
+          </p>
+        </div>
 
         {/* Checkbox Section */}
         {/* <div className="px-4 py-6">
@@ -180,6 +219,19 @@ const ProfileBox = () => {
         </div>
       */}
 
+        {!user?.isVerified && (
+          <div className="px-4 py-6 w-full">
+            <button
+              onClick={() => verificationMutation.mutate(id)}
+              disabled={verificationMutation.isPending}
+              className="disabled:bg-primary/70 mt-3 flex w-[50%] sm:w-full lg:w-[30%] xl:w-[30%] md:w-[30%] justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit"
+            >
+              {verificationMutation.isPending
+                ? "Verifying......"
+                : "Profile verify"}
+            </button>
+          </div>
+        )}
         {/* Submit Button */}
         {/* <div className="px-4 py-6">
           <button
