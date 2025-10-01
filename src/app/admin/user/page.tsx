@@ -26,7 +26,7 @@ type TableUser = {
   email: string;
   phone?: string;
   userType: string;
-  aadharDetails?: { aadharNumber: string; aadharImage: string };
+  aadhar?: { aadharNumber: string; aadharImage: string };
   panDetails?: { panNumber: string; pamImage: string };
   isVerified: boolean;
   lifetime_earning: string;

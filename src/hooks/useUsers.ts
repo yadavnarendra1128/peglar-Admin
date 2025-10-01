@@ -9,15 +9,14 @@ import {
   loginApi,
   type LoginDto,
   type LoginResponse,
+  getAllCarpenters,
 } from '@/api/services/base.service';
-import { useEffect } from "react";
-import { getAllCarpenters } from "../../api/services/base.service";
 
 export const useUsers = () => {
   return useQuery<BackendUser[], Error>({
     queryKey: ["users"],
     queryFn: getAllUsers,
-    staleTime: 60 * 1000,
+    // staleTime: 60 * 1000,
   });
 };
 
@@ -25,7 +24,7 @@ export const useCarpenters= () => {
   return useQuery<BackendUser[], Error>({
     queryKey: ["carpenters"],
     queryFn: getAllCarpenters,
-    staleTime: 60 * 1000,
+    // staleTime: 60 * 1000,
   });
 };
 

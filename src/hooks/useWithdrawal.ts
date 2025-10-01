@@ -15,7 +15,7 @@ const useWithdrawals = () => {
   return useQuery<Withdrawal[], Error>({
     queryKey: ["withdrawals"],
     queryFn: getAllWithdrawals,
-    staleTime: 60 * 1000 * 5,
+    // staleTime: 60 * 1000 * 5,
   });
 };
 export default useWithdrawals;

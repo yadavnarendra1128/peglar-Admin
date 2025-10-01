@@ -1,11 +1,11 @@
-import { apiClient } from "../lib/apiClient";
+import { apiClient } from "../../../api/lib/apiClient";
 
 export type CreateSubcategoryDto = {
   name: string;
   categoryId: string;
 };
 
-type Subcategory = {
+export type Subcategory = {
   id: string;
   name: string;
   categoryId: string;

@@ -13,8 +13,8 @@ export interface User {
 
   dealerName: string | null;
   companyDetails: string | null;
-  aadharDetails: string | null;
-  panDetails: string | null;
+  aadhar:{aadharImage: string;aadharNumber:string};
+  panDetail:{panImage: string;panNumber:string};
   distributorName: string | null;
 
   profession: string | null;

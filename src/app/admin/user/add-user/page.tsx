@@ -63,7 +63,7 @@ export default function Page() {
 
     // Append Aadhar & PAN JSON as string
     payload.append(
-      "aadharDetails",
+      "aadhar",
       JSON.stringify({ aadharNumber: formData.aadharNumber })
     );
     payload.append(

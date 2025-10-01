@@ -69,8 +69,8 @@ export type BackendUser = {
   phone?: string;
   profileImg?: string | null;
   userType: "customer" | "dealer" | "carpenter" | "admin";
-  aadharDetails?: { aadharNumber: string; aadharImage: string };
-  panDetails?: { panNumber: string; pamImage: string };
+  aadhar?: { aadharNumber: string; aadharImage: string };
+  panDetail?: { panNumber: string; pamImage: string };
   isVerified: boolean;
   lifetime_earning: string;
   createdAt: string;
@@ -80,7 +80,15 @@ export type BackendUser = {
 };
 
 // ============ User ============ 
-
+export const getAllCarpenters = async (): Promise<BackendUser[]> => {
+  try {
+    const res = await apiClient.get("/users/all-carpenter");
+    return res.data.data;
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
+};
 export const getAllUsers = async (): Promise<BackendUser[]> => {
   try {
   const res = await apiClient.get("/users");
@@ -127,7 +135,7 @@ formData.append("name", payload.name);
 formData.append("phone", payload.phone);
 
 // Stringify JSON details
-formData.append("aadharDetails", JSON.stringify({ aadharNumber: payload.aadharNumber }));
+formData.append("aadhar", JSON.stringify({ aadharNumber: payload.aadharNumber }));
 formData.append("panDetails", JSON.stringify({ panNumber: payload.panNumber }));
 
 // Append files
@@ -331,8 +339,7 @@ export const getProfileApi = async (): Promise<User> => {
 // ------ upload ---------------
 export const uploadFile = async (file:File, section:string):Promise<MediaType> => {
   try {
-    const basePath =      process.env.NEXT_PUBLIC_API_BASE_PATH || "http://31.97.61.201";
-    const formData = new FormData();
+        const formData = new FormData();
     formData.append("section", section);
     formData.append("media", file);
     const res = await axios.post(

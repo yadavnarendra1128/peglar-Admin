@@ -1,5 +1,4 @@
-import { apiClient } from "../lib/apiClient";
-
+import { apiClient } from "../../../api/lib/apiClient";
 export const handleUpdate = async (id: string, name: string) => {
   const res = await apiClient.put("/categories/" + id, { name });
   return res.data.data;

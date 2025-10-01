@@ -1,4 +1,4 @@
-import { apiClient, basePath } from "../lib/apiClient";
+import { apiClient, basePath } from "../../../api/lib/apiClient";
 // QR Code Generation Types and API
 export type GenerateBulkQRRequest = {
   product_id: string;

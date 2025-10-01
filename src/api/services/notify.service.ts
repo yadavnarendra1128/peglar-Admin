@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/lib/apiClient";
+import { apiClient } from "../../../api/lib/apiClient";
 
 export const sendNotifications = async (payload: {
   title: string;

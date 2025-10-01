@@ -8,7 +8,7 @@ export const useProducts = () => {
     queryKey: ["products"],
     queryFn: getAllProducts,
     // Caches data for 5 minutes
-    staleTime: 1000 * 60 * 5,
+    // staleTime: 1000 * 60 * 5,
     // Prevents refetching every time the window is focused
     refetchOnWindowFocus: false,
   });

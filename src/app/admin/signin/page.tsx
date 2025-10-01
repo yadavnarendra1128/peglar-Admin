@@ -1,16 +1,20 @@
-import React from "react";
+'use client'
+import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
-import { Metadata } from "next";
 import Signin from "@/components/Admin/Auth/Signin";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Next.js Login Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Login Page NextAdmin Dashboard Kit",
-};
 
-const SignIn: React.FC = () => {
+export default function SignIn(){
+  const router=useRouter()
+  const {user,loading}=useAuth()
+  useEffect(()=>{
+    if(!loading && user){
+      router.push('/admin')
+    }
+  },[loading,user])
   return (
     <>
       {/* <Breadcrumb pageName="Sign In" /> */}
@@ -58,4 +62,3 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;

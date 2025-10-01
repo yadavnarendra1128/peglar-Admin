@@ -13,6 +13,6 @@ export const useCategories = () => {
   return useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: fetchCategory, // fetchCategory already returns Category[]
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // staleTime: 10 * 1000, // 5 minutes
   });
 };

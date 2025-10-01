@@ -100,7 +100,7 @@ export default function GuruTable() {
     mutationFn: ({ id, name }: { id: string; name: string }) =>
       handleUpdate(id, name),
     onSuccess: (data, variables) => {
-      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      qc.invalidateQueries({ queryKey: ["categories"] });
       setEditId(null);
       setEditValue("");
       console.log("DATAAAAAAAAAA", data);
@@ -274,7 +274,7 @@ export default function GuruTable() {
         },
       },
     ],
-    [handleUpdate, handleDelete, editId, editValue, updateMutation.isPending]
+    [handleUpdate, handleDelete, editId, editValue, updateMutation.isPending,localData]
   );
 
   const renderContent = () => {

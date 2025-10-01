@@ -1,21 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import CheckboxTwo from "../FormElements/Checkboxes/CheckboxTwo";
 import { User } from "@/types/user";
 import { useParams } from "next/navigation";
 import { getUserById } from "../../../../api/services/base.service";
 import showToast from "../../../../api/lib/showToast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { error } from "console";
+import { useMutation } from "@tanstack/react-query";
 import { profileVerification } from "@/api/services/base.service";
-
+import { basePath } from "../../../../api/lib/apiClient";
 const ProfileBox = () => {
   const params = useParams()
   const id = params.id as string;
   const [user,setUser]=useState<User | null>(null)
   const [tags, setTags] = useState<string[]>([]);
-
   const pages = [
     "User",
     "Course",
@@ -70,12 +67,10 @@ const ProfileBox = () => {
     <>
       <div className="overflow-hidden rounded-[10px] pb-8 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
         <div className="relative z-20 h-35 md:h-65">
-          <Image
+          <img
             src={"/images/cover/cover-01.png"}
             alt="profile cover"
             className="h-full w-full rounded-tl-[10px] rounded-tr-[10px] object-cover object-center"
-            width={970}
-            height={260}
             style={{
               width: "auto",
               height: "auto",
@@ -85,10 +80,8 @@ const ProfileBox = () => {
         <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-[176px] sm:p-3">
             <div className="relative drop-shadow-2">
-              <Image
+              <img
                 src={user?.profileImg || "/images/user/user-03.png"}
-                width={160}
-                height={160}
                 className="overflow-hidden rounded-full"
                 alt="profile"
               />
@@ -97,9 +90,47 @@ const ProfileBox = () => {
           {(user?.email || user?.name) && (
             <div className="mt-4">
               {user?.name && (
-                <h3 className="mb-1 text-heading-5 font-bold text-dark dark:text-white text-[24px] md:text-[28px]">
-                  {user?.name}
-                </h3>
+                <div className="flex items-center justify-center gap-1">
+                  <h3 className="mb-1 text-heading-5 font-bold text-dark dark:text-white text-[24px] md:text-[28px]">
+                    {user?.name}
+                  </h3>
+                  {user?.userType === "carpenter" && (
+  <div>
+    {user?.isVerified ? (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#2bb13a"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    ) : (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="red"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+        <path d="M9 10l6 6" />
+        <path d="M15 10l-6 6" />
+      </svg>
+    )}
+  </div>
+)}
+                </div>
               )}
               {user?.email && (
                 <p className="font-medium text-[16px] md:text-[20px]">
@@ -128,7 +159,7 @@ const ProfileBox = () => {
             </span>
           </p>
 
-          {user?.userType == "carpenter" && (
+          {/* {user?.userType == "carpenter" && (
             <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
               <span className="font-medium text-gray-700 ">isVerified:</span>{" "}
               <span
@@ -138,7 +169,7 @@ const ProfileBox = () => {
                 {String(user?.isVerified)}
               </span>
             </p>
-          )}
+          )} */}
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
             <span className="font-medium text-gray-700 ">Wallet:</span>{" "}
             <span
@@ -149,6 +180,30 @@ const ProfileBox = () => {
             </span>
           </p>
         </div>
+<div className="w-full flex justify-center gap-2 items-center">
+  {/* ✅ First Image */}
+  <img
+   src={
+    user?.aadhar?.aadharImage
+      ? `${basePath}${user.aadhar?.aadharImage}`
+      : "/images/user/user-03.png"
+  }
+    alt="profile cover"
+    className="w-[45%] h-auto object-contain"
+  />
+
+  {/* ✅ Second Image */}
+    <img
+       src={
+    user?.panDetail?.panImage
+      ? `${basePath}${user?.panDetail?.panImage}`
+      : "/images/user/user-03.png"
+  }
+      className="w-[45%] h-auto object-contain"
+      alt="profile"
+    />
+</div>
+
 
         {/* Checkbox Section */}
         {/* <div className="px-4 py-6">

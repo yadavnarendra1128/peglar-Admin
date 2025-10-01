@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
@@ -15,35 +15,32 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   deleteSubcategory,
   updateSubcategory,
 } from "@/api/services/subcategory.service";
 import { useCategories } from "@/hooks/useCategories";
-import { Subcategory, useSubcategories } from "@/hooks/useSubcategories";
+import { useSubcategories } from "@/hooks/useSubcategories";
 import showToast from "@/api/lib/showToast";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
 import { useDeleteModal } from "@/context/DeleteModalContext";
-
-// Define the Category interface locally
-// interface Category {
-//   id: string;
-//   name: string;
-// }
+import { Subcategory } from "@/api/services/base.service";
 
 type TableRow = {
   subcategoryId: string;
   subcategoryName: string;
   categoryId: string;
   categoryName: string;
-  createdAt: string;
+  updatedAt: string;
 };
 
 export default function SubcategoriesPage() {
   const qc = useQueryClient();
 
   const { item, isOpen, openModal, closeModal } = useDeleteModal();
+
+  const [localData, setLocalData] = useState<Subcategory[]>([]);
 
   // Fetch subcategories
   const {
@@ -83,8 +80,6 @@ export default function SubcategoriesPage() {
     },
   });
 
-  // Category map
-  // Category map
   const categoryMap = useMemo(() => {
     const m = new Map<string, string>();
     categories.forEach((c) => m.set(c.id, c.name));
@@ -93,28 +88,35 @@ export default function SubcategoriesPage() {
 
   // Table data
   const tableData: TableRow[] = useMemo(() => {
-    return subcategories
+    return localData
       .map((s: Subcategory) => ({
         subcategoryId: s.id,
         subcategoryName: s.name,
         categoryId: s.categoryId,
         categoryName: categoryMap.get(s.categoryId) ?? "-",
-        createdAt: new Date(s.createdAt).toLocaleString(),
+        updatedAt: new Date(s.updatedAt).toLocaleString(),
       }))
-      .filter((s: Subcategory) => categoryMap.has(s.categoryId));
-  }, [subcategories, categoryMap]);
+      .filter((s) => categoryMap.has(s.categoryId));
+  }, [localData, categoryMap]);
 
-  //   // Table data
-  // const tableData: TableRow[] = useMemo(() => {
-  //   return subcategories
-  //     .map((s:Subcategory) => ({
-  //       subcategoryId: s.id,
-  //       subcategoryName: s.name,
-  //       categoryId: s.categoryId,
-  //       categoryName: s.Category?.name,
-  //       createdAt: new Date(s.createdAt).toLocaleString(),
-  //     }));
-  // }, [subcategories, hiddenIds]);
+  // Mutation for update
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteSubcategory(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subcategories"] });
+      showToast(true, `deleted successfully`);
+    },
+    onError: (err) => {
+      showToast(
+        false,
+        `Failed to delete user ${item?.subcategoryName}. \n ${err}`
+      );
+    },
+  });
+
+  const onConfirmDelete = async () => {
+    deleteMutation.mutate({ id: item.subcategoryId });
+  };
 
   const columns = useMemo<MRT_ColumnDef<TableRow>[]>(() => {
     return [
@@ -151,7 +153,15 @@ export default function SubcategoriesPage() {
       },
       // { accessorKey: "categoryId", header: "Category ID", size: 260 },
       // { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
-      // { accessorKey: "createdAt", header: "Created At", size: 200 },
+      {
+        accessorKey: "updatedAt",
+        header: "Updated At",
+        size: 1,
+        Cell: ({ cell }) =>
+          cell.getValue<string>()
+            ? new Date(cell.getValue<string>()).toLocaleString()
+            : "-",
+      },
       {
         id: "actions",
         header: "Actions",
@@ -212,36 +222,11 @@ export default function SubcategoriesPage() {
         },
       },
     ];
-  }, [editId, editValue, updateMutation.isPending]);
+  }, [editId, editValue]);
 
-  // const handleHide = (row: MRT_Row<TableRow>) => {
-
-  //   const id = row.original.subcategoryId;
-  //   setHiddenIds((prev) => {
-  //     const next = new Set(prev);
-  //     next.add(id);
-  //     return next;
-  //   });
-  // };
-
-  const onConfirmDelete = async () => {
-    deleteMutation.mutate({ id: item.subcategoryId });
-  };
-
-  // Mutation for update
-  const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: string }) => deleteSubcategory(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["subcategories"] });
-      showToast(true, `deleted successfully`);
-    },
-    onError: (err) => {
-      showToast(
-        false,
-        `Failed to delete user ${item?.subcategoryName}. \n ${err}`
-      );
-    },
-  });
+  useEffect(() => {
+      setLocalData(subcategories.filter((x) => x.is_active));
+  }, [subcategories]);
 
   if (subsLoading) {
     return (
@@ -269,7 +254,7 @@ export default function SubcategoriesPage() {
     <DefaultLayout>
       <Breadcrumb pageName="Subcategories" />
       <MaterialReactTable
-        columns={[...columns]}
+        columns={columns}
         data={tableData}
         initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
         enableColumnResizing

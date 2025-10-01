@@ -1,4 +1,4 @@
-import { apiClient } from "../lib/apiClient";
+import { apiClient,basePath } from "../../../api/lib/apiClient";
 import { getUserById } from "./base.service";
 
 // ============ Withdrawals ============

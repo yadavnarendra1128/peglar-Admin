@@ -1,4 +1,4 @@
-import { apiClient } from "../lib/apiClient";
+import { apiClient} from "../../../api/lib/apiClient";
 
 export type Product = {
   id: string;
