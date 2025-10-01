@@ -415,7 +415,7 @@ export default function AddProductPage() {
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        className="absolute inset-0 z-50 w-10 h-10 opacity-0 cursor-pointer"
+        className="absolute inset-0 z-50 w-10 h-[40px] opacity-0 cursor-pointer"
         accept="image/*,video/*"
       />
       <div className="w-full mx-auto">
@@ -648,7 +648,7 @@ export default function AddProductPage() {
             <>
               <button
                 type="button"
-                className="button cursor-pointer hover:bg-primary/80  w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] rounded-full absolute bg-primary left-2 flex items-center justify-center top-[55%] md:top-[55%] xl:top-[55%]"
+                className="button cursor-pointer hover:bg-primary/80  w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-[40px] border-2 border-[#BA6C8F] rounded-full absolute bg-primary left-2 flex items-center justify-center top-[55%] md:top-[55%] xl:top-[55%]"
                 onClick={previous}
               >
                 <svg
@@ -668,7 +668,7 @@ export default function AddProductPage() {
               </button>
               <button
                 type="button"
-                className="button cursor-pointer hover:bg-primary/80 w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-10 border-2 border-[#BA6C8F] bg-primary flex items-center justify-center rounded-full absolute right-2 top-[55%] md:top-[55%] xl:top-[55%]"
+                className="button cursor-pointer hover:bg-primary/80 w-6 h-6 md:w-8 md:h-8 xl:w-10 xl:h-[40px] border-2 border-[#BA6C8F] bg-primary flex items-center justify-center rounded-full absolute right-2 top-[55%] md:top-[55%] xl:top-[55%]"
                 onClick={next}
               >
                 <svg
