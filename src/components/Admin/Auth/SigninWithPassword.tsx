@@ -118,7 +118,7 @@ export default function SigninWithPassword({
         </div>
       </div>
 
-      <div className="mb-6 flex items-center justify-between gap-2 py-2">
+      {/* <div className="mb-6 flex items-center justify-between gap-2 py-2">
         <label
           htmlFor="remember"
           className="flex cursor-pointer select-none items-center font-satoshi text-base font-medium text-dark dark:text-white"
@@ -154,14 +154,14 @@ export default function SigninWithPassword({
           </span>
           Remember me
         </label>
-        {/* <button
+        <button
           onClick={handleForgotPass}
           className="select-none font-satoshi text-base font-medium text-black/80 cursor-pointer
  underline duration-300 hover:text-hoverPrimary dark:text-black/80 dark:hover:text-primary"
         >
           Forgot Password?
-        </button> */}
-      </div>
+        </button>
+      </div> */}
 
       {errorMsg && (
         <p className="mb-2 text-sm text-red-600" role="alert">

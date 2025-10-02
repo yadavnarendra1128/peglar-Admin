@@ -294,7 +294,7 @@ const VariantComponent = ()=>{
           <MaterialReactTable
             columns={columns}
             data={variants}
-            initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
+            initialState={{ pagination: { pageSize: 100, pageIndex: 0 } }}
             enableColumnResizing
             muiTableProps={{ sx: { border: "1px solid #ccc" } }}
             muiTableHeadCellProps={{

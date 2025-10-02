@@ -296,7 +296,7 @@ export default function GuruTable() {
       <MaterialReactTable
         columns={columns}
         data={localData}
-        initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
+        initialState={{ pagination: { pageSize: 100, pageIndex: 0 } }}
         muiTableProps={{ sx: { border: "1px solid #ccc" } }}
         muiTableHeadCellProps={{
           sx: {

@@ -256,7 +256,7 @@ export default function SubcategoriesPage() {
       <MaterialReactTable
         columns={columns}
         data={tableData}
-        initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
+        initialState={{ pagination: { pageSize: 100, pageIndex: 0 } }}
         enableColumnResizing
         state={{
           isLoading: subsLoading,

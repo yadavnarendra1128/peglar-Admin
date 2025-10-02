@@ -4,7 +4,7 @@ import {
   BackendUser,
   createSubcategory,
   CreateSubcategoryDto,
-  getAllUsers,
+  getAllCustomers,getAllDealers,
   Subcategory,
   loginApi,
   type LoginDto,
@@ -12,10 +12,10 @@ import {
   getAllCarpenters,
 } from '@/api/services/base.service';
 
-export const useUsers = () => {
+export const useCustomers = () => {
   return useQuery<BackendUser[], Error>({
-    queryKey: ["users"],
-    queryFn: getAllUsers,
+    queryKey: ["customers"],
+    queryFn: getAllCustomers,
     // staleTime: 60 * 1000,
   });
 };
@@ -24,6 +24,14 @@ export const useCarpenters= () => {
   return useQuery<BackendUser[], Error>({
     queryKey: ["carpenters"],
     queryFn: getAllCarpenters,
+    // staleTime: 60 * 1000,
+  });
+};
+
+export const useDealers= () => {
+  return useQuery<BackendUser[], Error>({
+    queryKey: ["dealers"],
+    queryFn: getAllDealers,
     // staleTime: 60 * 1000,
   });
 };

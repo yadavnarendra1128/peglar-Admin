@@ -98,7 +98,7 @@ export default function Transition() {
         columns={[...columns]}
         data={data}
         initialState={{
-          pagination: { pageSize: 5, pageIndex: 0 },
+          pagination: { pageSize: 100, pageIndex: 0 },
         }}
         enableColumnResizing
       />

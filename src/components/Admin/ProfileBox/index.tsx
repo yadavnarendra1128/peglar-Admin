@@ -1,13 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { User } from "@/types/user";
 import { useParams } from "next/navigation";
-import { getUserById } from "../../../../api/services/base.service";
-import showToast from "../../../../api/lib/showToast";
+import { getUserById, updateUser } from "@/api/services/base.service";
+import showToast from "@/api/lib/showToast";
 import { useMutation } from "@tanstack/react-query";
-import { profileVerification } from "@/api/services/base.service";
 import { basePath } from "../../../../api/lib/apiClient";
+import { ShieldCheck,ShieldX } from 'lucide-react';
+import { sendNotification } from "@/api/services/notify.service";
+
 const ProfileBox = () => {
   const params = useParams()
   const id = params.id as string;
@@ -54,18 +55,32 @@ const ProfileBox = () => {
       fetchUser()
     }
   },[id])
- const verificationMutation = useMutation({
-   mutationFn: (id: string) => profileVerification(id),
-   onSuccess: (data) => {
-     showToast(true, "Profile verified successfully");
-   },
-   onError: (error) => {
-     showToast(false, "Error in verification:" + error);
-   },
- });
+
+  const verificationMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await updateUser(id, { isVerified: true });
+      await sendNotification({
+        userId: id,
+        title: "Updates",
+        message: "Profile Verified",
+      });
+      return res;
+    },
+    onSuccess: (data) => {
+      setUser(data)
+      showToast(true, "Profile verified and notification sent successfully");
+    },
+    onError: (error: any) => {
+      showToast(
+        false,
+        "Error : " + error.message
+      );
+    },
+  });
+
   return (
     <>
-      <div className="overflow-hidden rounded-[10px] pb-8 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
+      <div className="overflow-hidden rounded-[10px] pb-20 mb-10 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
         <div className="relative z-20 h-35 md:h-65">
           <img
             src={"/images/cover/cover-01.png"}
@@ -81,7 +96,11 @@ const ProfileBox = () => {
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-[176px] sm:p-3">
             <div className="relative drop-shadow-2">
               <img
-                src={user?.profileImg || "/images/user/user-03.png"}
+                src={
+                  user?.profileImg
+                    ? `${basePath}${user.profileImg}`
+                    : "/images/user/user-03.png"
+                }
                 className="overflow-hidden rounded-full"
                 alt="profile"
               />
@@ -90,46 +109,19 @@ const ProfileBox = () => {
           {(user?.email || user?.name) && (
             <div className="mt-4">
               {user?.name && (
-                <div className="flex items-center justify-center gap-1">
+                <div className="flex items-center justify-center gap-2">
                   <h3 className="mb-1 text-heading-5 font-bold text-dark dark:text-white text-[24px] md:text-[28px]">
                     {user?.name}
                   </h3>
                   {user?.userType === "carpenter" && (
-  <div>
-    {user?.isVerified ? (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#2bb13a"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-        <path d="m9 12 2 2 4-4" />
-      </svg>
-    ) : (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="red"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-        <path d="M9 10l6 6" />
-        <path d="M15 10l-6 6" />
-      </svg>
-    )}
-  </div>
-)}
+                    <div>
+                      {user?.isVerified ? (
+                        <ShieldCheck className="text-green-500" />
+                      ) : (
+                        <ShieldX />
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
               {user?.email && (
@@ -159,17 +151,6 @@ const ProfileBox = () => {
             </span>
           </p>
 
-          {/* {user?.userType == "carpenter" && (
-            <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
-              <span className="font-medium text-gray-700 ">isVerified:</span>{" "}
-              <span
-                // className="w-1/2 capitalize"
-                style={{ width: "50%", textAlign: "right" }}
-              >
-                {String(user?.isVerified)}
-              </span>
-            </p>
-          )} */}
           <p className="text-[16px] md:text-[20px] flex justify-between gap-10">
             <span className="font-medium text-gray-700 ">Wallet:</span>{" "}
             <span
@@ -179,76 +160,103 @@ const ProfileBox = () => {
               {user?.wallet_balance}
             </span>
           </p>
-        </div>
-<div className="w-full flex justify-center gap-2 items-center">
-  {/* ✅ First Image */}
-  <img
-   src={
-    user?.aadhar?.aadharImage
-      ? `${basePath}${user.aadhar?.aadharImage}`
-      : "/images/user/user-03.png"
-  }
-    alt="profile cover"
-    className="w-[45%] h-auto object-contain"
-  />
 
-  {/* ✅ Second Image */}
-    <img
-       src={
-    user?.panDetail?.panImage
-      ? `${basePath}${user?.panDetail?.panImage}`
-      : "/images/user/user-03.png"
-  }
-      className="w-[45%] h-auto object-contain"
-      alt="profile"
-    />
-</div>
-
-
-        {/* Checkbox Section */}
-        {/* <div className="px-4 py-6">
-          <h4 className="text-xl font-bold mb-4">Select Pages:</h4>
-          <div className="flex flex-wrap gap-2">
-            {pages.map((tag) => (
-              <CheckboxTwo
-                key={tag}
-                label={tag}
-                isChecked={tags.includes(tag)}
-                onChange={(isChecked) => handleCheckboxChange(tag, isChecked)}
-              />
-            ))}
-          </div>
-        </div> */}
-
-        {/* Tag Display Section */}
-        {/*
-        <div className="px-4 py-6">
-          <div className="w-full min-h-[100px] border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 flex flex-wrap gap-2">
-            {tags.map((tag) => (
+          {user?.userType == "carpenter" && (
+            <p className="hidden text-[16px] md:text-[20px] md:flex justify-between gap-10">
+              <span className="font-medium text-gray-700 ">Aadhar Number:</span>{" "}
               <span
-                key={tag}
-                className="bg-stroke text-primary px-3 py-1 rounded-full flex items-center gap-2"
+                className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
               >
-                {tag}
-                <button
-                  type="button"
-                  className="text-red-500 font-bold ml-2"
-                  onClick={() => removeTag(tag)}
-                >
-                  &times;
-                </button>
+                {user?.aadhar?.aadharNumber}
               </span>
-            ))}
-            {tags.length === 0 && (
-              <p className="text-gray-500 ">
-                No pages selected.
-              </p>
-            )}
-          </div>
-        </div>
-      */}
+            </p>
+          )}
 
-        {!user?.isVerified && (
+          {user?.userType == "carpenter" && (
+            <p className="hidden text-[16px] md:text-[20px] md:flex justify-between gap-10">
+              <span className="font-medium text-gray-700 ">Pan Number:</span>{" "}
+              <span
+                className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
+              >
+                {user?.panDetail?.panNumber}
+              </span>
+            </p>
+          )}
+        </div>
+
+        {user?.userType == "carpenter" && (
+          <div className="w-full my-2 md:my-8 flex flex-col md:flex-row gap-4 md:gap-2">
+            <p className="px-5 md:hidden text-[16px] md:text-[20px] flex justify-between gap-10">
+              <span className="font-medium text-gray-700 ">Aadhar Number:</span>{" "}
+              <span
+                className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
+              >
+                {user?.aadhar?.aadharNumber}
+              </span>
+            </p>
+            <div className="relative flex flex-col items-center w-full md:w-[45%] h-auto md:h-100 mx-auto">
+              <img
+                src={
+                  user?.aadhar?.aadharImage
+                    ? `${basePath}${user.aadhar?.aadharImage}`
+                    : "/images/user/user-03.png"
+                }
+                alt="aadhar"
+                className="w-full h-full object-contain p-2 rounded"
+              />
+              <a
+                href={
+                  user?.aadhar?.aadharImage
+                    ? `${basePath}${user.aadhar?.aadharImage}`
+                    : "#"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="md:absolute md:-bottom-10 mt-1 rounded-lg text-md text-white bg-primary hover:bg-hoverPrimary px-4 py-2"
+              >
+                View Aadhar
+              </a>
+            </div>
+
+            <p className="px-5 md:hidden text-[16px] md:text-[20px] flex justify-between gap-10">
+              <span className="font-medium text-gray-700 ">Pan Number:</span>{" "}
+              <span
+                className="w-1/2 capitalize"
+                style={{ width: "50%", textAlign: "right" }}
+              >
+                {user?.panDetail?.panNumber}
+              </span>
+            </p>
+            <div className="relative flex flex-col items-center w-full h-auto md:h-100 md:w-[45%] mx-auto">
+              <img
+                src={
+                  user?.panDetail?.panImage
+                    ? `${basePath}${user?.panDetail?.panImage}`
+                    : "/images/user/user-03.png"
+                }
+                alt="pan"
+                className="w-full h-full object-contain p-2 rounded"
+              />
+              <a
+                href={
+                  user?.panDetail?.panImage
+                    ? `${basePath}${user?.panDetail?.panImage}`
+                    : "#"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 md:absolute md:-bottom-10 rounded-lg text-md text-white bg-primary hover:bg-hoverPrimary px-4 py-2"
+              >
+                View Pan
+              </a>
+            </div>
+          </div>
+        )}
+
+        {user?.userType == "carpenter" && !user?.isVerified && (
           <div className="px-4 py-6 w-full">
             <button
               onClick={() => verificationMutation.mutate(id)}
@@ -257,7 +265,7 @@ const ProfileBox = () => {
             >
               {verificationMutation.isPending
                 ? "Verifying......"
-                : "Profile verify"}
+                : "Verify Profile"}
             </button>
           </div>
         )}

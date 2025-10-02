@@ -1,11 +1,11 @@
 // src/components/Admin/Auth/SigninWithPassword.tsx
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useUsers";
 import { formDataProps } from "./Signin";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ForgotPassword({
   form,
@@ -21,6 +21,7 @@ export default function ForgotPassword({
 
   const router = useRouter();
   const { mutateAsync, isPending } = useLogin();
+  const {setUser}=useAuth()
 
   const onChange =
     (name: "email" | "password") =>
@@ -46,12 +47,12 @@ export default function ForgotPassword({
 
     try {
       const res = await mutateAsync({ email:form.email, password:form.password });
-
-      const options: Cookies.CookieAttributes = {
-        secure: true,
-        sameSite: "none",
-      };
-      Cookies.set("token", res.token, options);
+      setUser(res.data)
+      // const options: Cookies.CookieAttributes = {
+      //   secure: true,
+      //   sameSite: "none",
+      // };
+      // Cookies.set("token", res.token, options);
 
       // Redirect
       router.push("/admin");

@@ -1,6 +1,7 @@
 "use client";
 
 import { basePath } from "@/api/lib/apiClient";
+import showToast from "@/api/lib/showToast";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/Admin/FormElements/InputGroup";
 import SelectGroupOne from "@/components/Admin/FormElements/SelectGroup/SelectGroupOne";
@@ -40,6 +41,54 @@ export default function Page() {
     panImage: "",
   });
 
+  const validateForm = () => {
+    let valid = true;
+    const newErrors: any = {};
+
+    // Name validation (no numbers allowed)
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+      valid = false;
+    } else if (!nameRegex.test(formData.name)) {
+      newErrors.name = "Name cannot contain numbers or symbols";
+      valid = false;
+    }
+
+    // Email check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+      valid = false;
+    }
+
+    // Password check
+    if (!formData.password || formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+
+    // User type check
+    if (!formData.userType) {
+      newErrors.userType = "User type is required";
+      valid = false;
+    }
+
+    // Phone check (if you enable it later)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!formData.phone || !phoneRegex.test(formData.phone)) {
+      newErrors.phone = "Valid phone number is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+
   const [selectedUserTypeId, setSelectedUserTypeId] = useState<string>("");
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -51,6 +100,11 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+     if (!validateForm()) {
+       console.log("Validation failed");
+       showToast(false,'Check errors above.')
+       return;
+     }
 
     const payload = new FormData();
 
@@ -67,7 +121,7 @@ export default function Page() {
       JSON.stringify({ aadharNumber: formData.aadharNumber })
     );
     payload.append(
-      "panDetails",
+      "panDetail",
       JSON.stringify({ panNumber: formData.panNumber })
     );
 
@@ -84,10 +138,29 @@ export default function Page() {
       const res = await axios.post(`${basePath}/api/users/register`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      // const res = await axios.post(`${basePath}/api/users/register`, payload, {
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
       console.log(res.data);
+      setFormData({
+    name: "",
+    phone: "",
+    email: "",
+    password: "",
+    userType: "",
+    aadharNumber: "",
+    panNumber: "",
+    aadharImage: null,
+    panImage: null,
+  })
+      showToast(true,'Success')
+
       // console.log("Server Response:", data);
     } catch (err) {
       console.error(err);
+      showToast(false,'Failed: ')
     }
   };
 
@@ -103,6 +176,7 @@ export default function Page() {
           value={formData.name}
           onChange={(val) => handleChange("name", val)}
           required
+          error={errors.name}
         />
 
         <InputGroup
@@ -121,6 +195,7 @@ export default function Page() {
           value={formData.email}
           onChange={(val) => handleChange("email", val)}
           required
+          error={errors.email}
         />
 
         <InputGroup
@@ -130,6 +205,7 @@ export default function Page() {
           value={formData.password}
           onChange={(val) => handleChange("password", val)}
           required
+          error={errors.password}
         />
 
         <SelectGroupOne
@@ -191,7 +267,7 @@ export default function Page() {
 
         <button
           type="submit"
-          className="mt-3 w-full rounded bg-primary p-3 text-white hover:bg-opacity-90"
+          className="mt-3 w-full cursor-pointer hover:bg-hoverPrimary rounded bg-primary p-3 text-white hover:bg-opacity-90"
         >
           Register User
         </button>

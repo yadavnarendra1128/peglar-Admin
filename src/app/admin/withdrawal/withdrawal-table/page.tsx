@@ -367,7 +367,7 @@ export default function WithdrawalTable() {
             enableRowActions={false} // Disabled to prevent duplicate actions
             initialState={{
               pagination: {
-                pageSize: 10,
+                pageSize: 100,
                 pageIndex: 0,
               },
               sorting: [

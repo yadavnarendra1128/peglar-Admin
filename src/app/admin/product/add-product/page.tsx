@@ -199,7 +199,8 @@ export default function AddProductPage() {
   }, [subData]);
 
    const handleDeleteButton = () => {
-     setIsDeleteModalOpen(true);
+     if(selectedMedia)setIsDeleteModalOpen(true);
+     else{showToast(false,'Media not found.')}
    };
 
     const handleSlideChange = (currentIndex: number) => {
@@ -453,17 +454,6 @@ export default function AddProductPage() {
                   customClasses="mb-4.5"
                   error={errors.model_no}
                 />
-
-                {/* Offer ID */}
-                {/* <InputGroup
-                  label="Offer ID"
-                  type="text"
-                  placeholder="Enter offer ID"
-                  value={formData.offer_id}
-                  onChange={(value) => handleChange("offer_id", value)}
-                  required
-                  customClasses="mb-4.5"
-                /> */}
 
                 {/* Product Description */}
                 <InputGroup

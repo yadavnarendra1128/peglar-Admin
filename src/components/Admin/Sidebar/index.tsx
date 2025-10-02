@@ -23,8 +23,6 @@ interface SidebarProps {
   setSidebarOpen: (arg: boolean) => void;
 }
 
-// Define menu groups with Material UI icons replacing the SVGs.
-// This keeps the sidebar icons consistent with Material Design standards.
 const menuGroups = [
   {
     menuItems: [
@@ -92,6 +90,15 @@ const menuGroups = [
         icon: <AccountBalanceWalletIcon fontSize="medium" />,
         label: "Withdrawal Table",
         route: "/admin/withdrawal/withdrawal-table",
+      },
+      {
+        icon: <QrCodeIcon fontSize="medium" />,
+        label: "Ticket",
+        route: "#",
+        children: [
+          // { label: "Generate Qr Code", route: "/admin/qr/generate-productqr" },
+          { label: "Ticket Table", route: "/admin/ticket/ticket-table" },
+        ],
       },
     ],
   },

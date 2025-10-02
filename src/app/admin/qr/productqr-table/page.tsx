@@ -286,7 +286,7 @@ export default function CertificateTable() {
         columns={[...columns]}
         data={mergeDataTable}
         state={{ isLoading: isLoading || productLoading, rowSelection }} // Pass the loading state to the table
-        initialState={{ pagination: { pageSize: 5, pageIndex: 0 } }}
+        initialState={{ pagination: { pageSize: 100, pageIndex: 0 } }}
         muiSkeletonProps={{
           animation: "wave",
         }}

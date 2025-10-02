@@ -1,4 +1,3 @@
-// src/app/admin/users/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,7 +9,7 @@ import {
 import DefaultLayout from "@/components/Admin/Layouts/DefaultLaout";
 import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import { useRouter } from "next/navigation";
-import { useCarpenters, useUsers } from "@/hooks/useUsers";
+import { useCarpenters, useCustomers, useDealers } from "@/hooks/useUsers";
 import { Typography } from "@mui/material";
 import { useDeleteModal } from "@/context/DeleteModalContext";
 import DeleteModal from "@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal";
@@ -18,8 +17,10 @@ import showToast from "../../../../api/lib/showToast";
 import { BackendUser, deleteUser } from "@/api/services/base.service";
 import { formatDateTime } from "@/utils/formatDateTime";
 import Notfication from "@/components/Admin/users/sendNotify";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/lib/apiClient";
+import { ShieldCheck, ShieldX } from "lucide-react";
+
 type TableUser = {
   id: string;
   name: string;
@@ -40,11 +41,18 @@ export default function UserTable() {
   const qc = useQueryClient();
   const [rowSelection, setRowSelection] = useState({});
   const [isUpdate, setIsUpdate] = useState(false);
-  const { data, isLoading, isError, error } = useUsers();
+  const { data, isLoading, isError, error } = useCustomers();
+  const {
+    data: dealerData,
+    isLoading: dealerIsLoading,
+    isError: dealerIsError,
+    error: dealerError,
+  } = useDealers();
   const { data:carpenterData, isLoading:carpIsLoading, isError:carpIsError, error:carpError } = useCarpenters();
-  const [carps, setCarps] = useState<BackendUser[]>();
-  const [selected,setSelected]=useState<'user'|'carpenter'>('user')
+  const [selected,setSelected]=useState<'user'|'carpenter'>('carpenter')
  const [users, setUsers] = useState<BackendUser[]>();
+  const [carps, setCarps] = useState<BackendUser[]>();
+
  const { item, isOpen, openModal, closeModal } = useDeleteModal();
  const [formData, setFormData] = useState({
    body: "",
@@ -54,13 +62,22 @@ export default function UserTable() {
   const onConfirmDelete=async()=>{
     try{
       await deleteUser(item.id)
-      setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
+      if(selected=='user'){setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
         if(!val)return []
         else return val
       })
-      showToast(true,`User ${item.name} deleted successfully`)
+    showToast(true, `User ${item.name} deleted successfully`);
+    }else{
+        setCarps((p) => {
+          const val = p ? p?.filter((e) => e.id.toString() !== item.id) : [];
+          if (!val) return [];
+          else return val;
+        });
+      showToast(true, `Carpenter ${item.name} deleted successfully`);
+      }
+      
     }catch(err){
-      showToast(false, `Failed to delete user ${item.name}. \n        ${err}`);
+      showToast(false, `Failed to delete ${item.name}. \n        ${err}`);
     }
   }
 
@@ -84,7 +101,7 @@ export default function UserTable() {
         enableColumnActions: false,
         Cell: ({ row }) => row.index + 1, // simply shows row number
       },
-      { accessorKey: "name", header: "Name", size: 220 },
+      { accessorKey: "name", header: "Name", size: 150 },
       {
         accessorKey: "email",
         header: "Email Address",
@@ -100,9 +117,43 @@ export default function UserTable() {
       {
         accessorKey: "createdAt",
         header: "Created At",
-        size: 200,
+        size: 160,
         Cell: ({ cell }) => formatDateTime(cell.getValue<string>()),
       },
+    ...(selected === "carpenter"
+    ? [
+        {
+          accessorKey: "Verified",
+          header: "Verified",
+          size: 100,
+          Cell: ({ row }) => (
+            row.original.isVerified ? (
+              <span
+                title="Verified"
+                style={{
+                  color: "green",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                }}
+              >
+                <ShieldCheck/>
+              </span>
+            ) : (
+              <span
+                title="Not Verified"
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                }}
+              >
+                <ShieldX className="text-red-500"/>
+              </span>
+            )
+          ),
+        },
+      ]
+    : []),
       {
         id: "actions",
         header: "Actions",
@@ -115,19 +166,7 @@ export default function UserTable() {
               justifyContent: "center",
             }}
           >
-            {/* Verified tick */}
-            {row.original.isVerified && (
-              <span
-                title="Verified"
-                style={{
-                  color: "green",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                }}
-              >
-                ✓
-              </span>
-            )}
+            
             {/* View Action */}
             <button
               onClick={() => handleView(row)}
@@ -162,7 +201,7 @@ export default function UserTable() {
         ),
       },
     ],
-    []
+    [selected]
   );
 
   const tableData: TableUser[] = useMemo(() => {
@@ -227,35 +266,13 @@ export default function UserTable() {
     console.log(res.data);
   };
 
-  const notfiyMutation = useMutation({
-    mutationFn: () => sendMessage(),
-    onSuccess: (data, variables) => {
-      qc.invalidateQueries({ queryKey: ["notifcation"] });
-      setIsUpdate(false);
-      console.log(data);
-      showToast(true, "notification sent successfully");
-    },
-    onError: (error) => {
-      console.error("notifcation failed:", error);
-      showToast(false, error.message);
-    },
-  });
+
   return (
     <DefaultLayout>
       {/* Page header with breadcrumb navigation */}
       <Breadcrumb pageName="User Table" />
 
       <div className="flex gap-2 mb-2 items-center">
-        <button
-          className={`px-4 py-2 rounded-lg cursor-pointer ${
-            selected === "user"
-              ? "bg-primary border border-primary text-white hover:border-hoverPrimary hover:bg-hoverPrimary"
-              : "border border-primary text-primary hover:bg-primary/10 hover:text-white"
-          }`}
-          onClick={() => setSelected("user")}
-        >
-          Users
-        </button>
         <button
           className={`px-4 py-2 rounded-lg cursor-pointer ${
             selected === "carpenter"
@@ -266,6 +283,17 @@ export default function UserTable() {
         >
           Carpenters
         </button>
+        <button
+          className={`px-4 py-2 rounded-lg cursor-pointer ${
+            selected === "user"
+              ? "bg-primary border border-primary text-white hover:border-hoverPrimary hover:bg-hoverPrimary"
+              : "border border-primary text-primary hover:bg-primary/10 hover:text-white"
+          }`}
+          onClick={() => setSelected("user")}
+        >
+          Users
+        </button>
+        
       </div>
 
       {(selected === "user" && isError) ||
@@ -280,7 +308,7 @@ export default function UserTable() {
           columns={columns}
           data={tableData}
           initialState={{
-            pagination: { pageSize: 5, pageIndex: 0 },
+            pagination: { pageSize: 100, pageIndex: 0 },
           }}
           enableColumnResizing
           muiTableProps={{

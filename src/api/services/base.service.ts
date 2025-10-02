@@ -89,6 +89,7 @@ export const getAllCarpenters = async (): Promise<BackendUser[]> => {
     throw new Error(e.message);
   }
 };
+
 export const getAllUsers = async (): Promise<BackendUser[]> => {
   try {
   const res = await apiClient.get("/users");
@@ -97,6 +98,26 @@ export const getAllUsers = async (): Promise<BackendUser[]> => {
  console.log(e);
  throw new Error(e.message);
    }
+};
+
+export const getAllCustomers = async (): Promise<BackendUser[]> => {
+  try {
+    const res = await apiClient.get("/users/all-customer");
+    return res.data.data;
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
+};
+
+export const getAllDealers = async (): Promise<BackendUser[]> => {
+  try {
+    const res = await apiClient.get("/users/all-dealer");
+    return res.data.data;
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
 };
 
 export const getProfile = async ()=>{
@@ -118,6 +139,16 @@ export const getUserById = async (id:string): Promise<User> => {
      console.log(e);
      throw new Error(e.message);
    }
+};
+
+export const updateUser = async (id: string,payload:any) => {
+  try {
+    const res = await apiClient.put(`/users/${id}`,payload);
+    return res.data.user
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.message);
+  }
 };
 
 export const deleteUser = async (id:string)=>{
@@ -146,12 +177,13 @@ formData.append("panImage", payload.panFile);
     const res = await axios.post(`/users/register`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-console.log(res)
+    console.log(res)
     return res
   }catch(e){
     console.log(e)
   }
 }
+
 // ============ Product ============
 
 export const getAllProducts = async (): Promise<Product[]> => {
@@ -370,12 +402,17 @@ export const deleteFile = async (body:{
   }
 };
 
-export const profileVerification = async (userId: string) => {
-  const payload = {
-    userId,
-    title: "Updates",
-    message: "Profile Verified",
-  };
-  const res = await apiClient.post("/notifications", payload);
-  return res.data.data;
-};
+// export const profileVerification = async (userId: string) => {
+//   try{
+//   const payload = {
+//     userId,
+//     title: "Updates",
+//     message: "Profile Verified",
+//   };
+
+//   const res = await apiClient.post("/notifications", payload);
+//   return res.data.data;
+// }catch(err:any){
+//   console.log(err.response.data?.error);
+//   throw "Failed to verify profile.";
+// }};
