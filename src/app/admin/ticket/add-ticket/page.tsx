@@ -37,8 +37,8 @@ export default function AddTicketPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.userId.trim()) newErrors.userId = "User ID is required";
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
+    // if (!formData.title.trim()) newErrors.title = "Title is required";
+    // if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.qrValue.trim()) newErrors.qrValue='Qr Value is required'
 
     setErrors(newErrors);

@@ -53,8 +53,18 @@ export const getAllProductQr = async () => {
   return res.data.data;
 };
 
-export const updateQrReward = async (payload: {}) => {
+export const updateQrReward = async (payload:any) => {
   const res = await apiClient.patch("/productQr/updateQrReward/", payload);
   console.log("DDDDDDDDDDDDDDDDDDDDDDD", res);
   return res.data;
 };
+
+export const getQrByValue = async(qrValue:string)=>{
+  try{
+    const res = await apiClient.get(`/productQr/qrcode/${qrValue}`);
+    console.log("qr val", res);
+  return res.data;
+  }catch(e){
+    console.log(e)
+  }
+}

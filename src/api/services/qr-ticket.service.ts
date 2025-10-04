@@ -58,7 +58,7 @@ export const createTicket = async (ticketData: {
 // ✅ Toggle ticket status
 export const toggleTicketStatus = async (ticketId: string): Promise<Ticket> => {
   try {
-    const res = await apiClient.patch(`/tickets/${ticketId}/status`);
+    const res = await apiClient.patch(`/tickets/${ticketId}`);
     return res.data.data;
   } catch (err: any) {
     console.error(`Failed to toggle status for ticket ${ticketId}:`, err);

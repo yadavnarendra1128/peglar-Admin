@@ -131,7 +131,7 @@ export const getProfile = async ()=>{
    }
 }
 
-export const getUserById = async (id:string): Promise<User> => {
+export const getUserById = async (id:string): Promise<BackendUser> => {
    try {
      const res = await apiClient.get(`/users/userId/${id}`);
      return res.data.user.data;

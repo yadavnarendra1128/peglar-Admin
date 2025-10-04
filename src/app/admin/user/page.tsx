@@ -49,9 +49,10 @@ export default function UserTable() {
     error: dealerError,
   } = useDealers();
   const { data:carpenterData, isLoading:carpIsLoading, isError:carpIsError, error:carpError } = useCarpenters();
-  const [selected,setSelected]=useState<'user'|'carpenter'>('carpenter')
+  const [selected,setSelected]=useState<'user' | 'carpenter' | 'dealer'>('carpenter')
  const [users, setUsers] = useState<BackendUser[]>();
   const [carps, setCarps] = useState<BackendUser[]>();
+  const [dealers, setDealers] = useState<BackendUser[]>();
 
  const { item, isOpen, openModal, closeModal } = useDeleteModal();
  const [formData, setFormData] = useState({
@@ -62,20 +63,28 @@ export default function UserTable() {
   const onConfirmDelete=async()=>{
     try{
       await deleteUser(item.id)
-      if(selected=='user'){setUsers((p)=>{const val = p ? p?.filter((e)=>e.id.toString()!==item.id) : []
-        if(!val)return []
-        else return val
-      })
-    showToast(true, `User ${item.name} deleted successfully`);
-    }else{
+      if (selected == "user") {
+        setUsers((p) => {
+          const val = p ? p?.filter((e) => e.id.toString() !== item.id) : [];
+          if (!val) return [];
+          else return val;
+        });
+        showToast(true, `Customer ${item.name} deleted successfully`);
+      } else if (selected == "carpenter") {
         setCarps((p) => {
           const val = p ? p?.filter((e) => e.id.toString() !== item.id) : [];
           if (!val) return [];
           else return val;
         });
-      showToast(true, `Carpenter ${item.name} deleted successfully`);
+        showToast(true, `Carpenter ${item.name} deleted successfully`);
+      } else if (selected == "dealer") {
+        setDealers((p) => {
+          const val = p ? p?.filter((e) => e.id.toString() !== item.id) : [];
+          if (!val) return [];
+          else return val;
+        });
+        showToast(true, `Dealer ${item.name} deleted successfully`);
       }
-      
     }catch(err){
       showToast(false, `Failed to delete ${item.name}. \n        ${err}`);
     }
@@ -205,7 +214,14 @@ export default function UserTable() {
   );
 
   const tableData: TableUser[] = useMemo(() => {
-      const list = selected === "user" ? users : carps;
+    let list;
+    if(selected == 'user'){
+      list = users
+    }else if(selected=='carpenter'){
+      list = carps;
+    }else if(selected=='dealer'){
+      list = dealers
+    }
       if (!list) return [];
       return list.map((u) => ({
         id: u.id,
@@ -218,12 +234,13 @@ export default function UserTable() {
         createdAt: u.createdAt,
         profileImg: u.profileImg ?? null,
       }));
-    }, [users,carps,selected]);
+    }, [users,carps,dealers,selected]);
 
   useEffect(()=>{
     setUsers(data)
     setCarps(carpenterData)
-  },[data,carpenterData])
+    setDealers(dealerData)
+  },[data,carpenterData,dealerData])
 
   useEffect(() => {
     if (!Object.keys(rowSelection).length) return;
@@ -246,6 +263,7 @@ export default function UserTable() {
     const token: string[] = [];
     const id = Object.keys(rowSelection).map((x) => parseInt(x));
     console.log(rowSelection);
+    console.log(id)
     for (let r = 0; r < tableData.length; r++) {
       const dataIndex = id[r];
       const fcmToken = tableData[dataIndex]?.fcm;
@@ -253,6 +271,7 @@ export default function UserTable() {
       if (fcmToken) token.push(fcmToken);
     }
 
+    console.log(token,'token')
     const apiPayload = {
       ...formData,
       tokens: token,
@@ -265,7 +284,6 @@ export default function UserTable() {
     showToast(true, "notification sent successfully");
     console.log(res.data);
   };
-
 
   return (
     <DefaultLayout>
@@ -291,16 +309,36 @@ export default function UserTable() {
           }`}
           onClick={() => setSelected("user")}
         >
-          Users
+          Customers
         </button>
-        
+        <button
+          className={`px-4 py-2 rounded-lg cursor-pointer ${
+            selected === "dealer"
+              ? "bg-primary border border-primary text-white hover:border-hoverPrimary hover:bg-hoverPrimary"
+              : "border border-primary text-primary hover:bg-primary/10 hover:text-white"
+          }`}
+          onClick={() => setSelected("dealer")}
+        >
+          Dealers
+        </button>
       </div>
 
       {(selected === "user" && isError) ||
-      (selected === "carpenter" && carpIsError) ? (
+      (selected === "carpenter" && carpIsError) ||
+      (selected === "dealer" && dealerIsError) ? (
         <Typography color="error" sx={{ p: 2 }}>
-          Failed to load {selected === "user" ? "users" : "carpenters"}:{" "}
-          {selected === "user" ? error?.message : carpError?.message}
+          Failed to load{" "}
+          {selected === "user"
+            ? "users"
+            : selected === "carpenter"
+            ? "carpenters"
+            : "dealers"}
+          :{" "}
+          {selected === "user"
+            ? error?.message
+            : selected === "carpenter"
+            ? carpError?.message
+            : dealerError?.message}
         </Typography>
       ) : (
         // Data table
@@ -337,7 +375,7 @@ export default function UserTable() {
             },
           })}
           state={{
-            isLoading: selected === "user" ? isLoading : carpIsLoading,
+            isLoading: selected === "user" ?  isLoading : selected == 'carpenter' ? carpIsLoading : dealerIsLoading,
             rowSelection,
           }}
           muiSkeletonProps={{

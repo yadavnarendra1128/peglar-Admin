@@ -1,10 +1,7 @@
 "use client";
-import Breadcrumb from "@/components/Admin/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/Admin/FormElements/InputGroup"; // Fixed typo here
-import React, { useEffect, useMemo, useState } from "react";
-import { QrCode } from "@/types/qrCode";
+import React, { useEffect } from "react";
 
-type batch_nos = string[];
 function MessageNotfiyModal({
   formData,
   setFormData,
@@ -16,27 +13,12 @@ function MessageNotfiyModal({
   };
   setFormData: any;
 }) {
-  // const [data, setData] = useState<batch_nos>([])
-  // //products list
-  // useEffect(() => {
-  //   console.log(productOptions)
-  //   const filtered = productOptions.map(x => x.batch_no)
-  //   const filteredBatchNo = Array.from(new Set(filtered))
-  //   setData(filteredBatchNo)
-  // }, [productOptions])
-
-  // const [Data, setData] = useState({
-  //   batch_no: "", reward_amount: ""
-  // }); // Dummy product data - ideally loaded from API or props
-
-  // Handle form input changes generically
 
   const handleChange = (field: string, value: string | number) => {
     console.log(field, value);
     setFormData((prev: {}) => ({ ...prev, [field]: value }));
-  }; // Form submission handler
+  };
 
-  // // Optional: Commented out check for available QR codes; uncomment if desired // if (qrCountNum > selectedProduct.count) { // alert( //  `Cannot generate ${qrCountNum} QR codes. Only ${selectedProduct.count} available for this product.` // ); // return; // }
   return (
     <div className="mt-4 mb-5">
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-1">
@@ -83,48 +65,10 @@ function MessageNotfiyModal({
           </div>
         </div>
       </div>
-
-      <div className="flex gap-3">
-        {/* <button
-
-          type="submit"
-          className="mt-3 flex flex-1 justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit disabled:opacity-50 disabled:cursor-not-allowed" // disabled={generateQRMutation.isLoading}
-        >
-          update
-        </button> */}
-      </div>
-      {/* Success Message and Download Section
-        {generatedQRData && (
-          <div
-            className="flex flex-col justify-center items-center bg-green-50 border border-green-200 rounded-lg p-6 dark:bg-green-900/20 dark:border-green-800"
-            style={{ margin: "40px 0" }}
-            >
-            <div className="text-center mb-4">
-            <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
-            QR Codes Generated Successfully! 🎉
-            </h3>
-            
-              <p className="text-green-700 dark:text-green-300">
-                {generatedQRData.message}
-              </p>
-  
-              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                Total QR codes generated:
-                <span className="font-medium">{generatedQRData.total}</span>
-              </p>
-            </div>
-  
-            <button
-              onClick={handleDownload}
-              className="mt-3 flex flex-1 justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 h-fit disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              📥 Download Excel File
-            </button>
-          </div>
-        )} */}
     </div>
   );
 }
+
 import { useRef } from "react";
 
 type Props = {

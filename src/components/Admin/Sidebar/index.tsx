@@ -38,7 +38,7 @@ const menuGroups = [
         children: [
           { label: "Add User", route: "/admin/user/add-user" },
           { label: "User Table", route: "/admin/user" },
-          { label: "Transaction Table", route: "/admin/user/transaction" },
+          // { label: "Transaction Table", route: "/admin/user/transaction" },
         ],
       },
       {
@@ -93,12 +93,12 @@ const menuGroups = [
       },
       {
         icon: <QrCodeIcon fontSize="medium" />,
-        label: "Ticket",
-        route: "#",
-        children: [
-          // { label: "Generate Qr Code", route: "/admin/qr/generate-productqr" },
-          { label: "Ticket Table", route: "/admin/ticket/ticket-table" },
-        ],
+        label: "Ticket Table",
+        route: "/admin/ticket/ticket-table",
+        // children: [
+        //   // { label: "Generate Qr Code", route: "/admin/qr/generate-productqr" },
+        //   { label: "Ticket Table", route: "/admin/ticket/ticket-table" },
+        // ],
       },
     ],
   },
