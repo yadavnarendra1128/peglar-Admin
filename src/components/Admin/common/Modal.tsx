@@ -47,7 +47,7 @@ export default function Modal({popupClassName='', selected,setSelected,isOpen,se
 
                     updated.sort((a, b) => {
                       if (a.status === b.status) return 0;
-                      return a.status ? 1 : -1; 
+                      return a.status ? -1 : 1; 
                     });
                     return updated;
                   });
@@ -58,7 +58,7 @@ export default function Modal({popupClassName='', selected,setSelected,isOpen,se
                 }
         }
   
-        const sendNotificationFn = async ()=>{
+    const sendNotificationFn = async ()=>{
           if(user){
           try {
             const res = await sendNotification({
@@ -74,7 +74,7 @@ export default function Modal({popupClassName='', selected,setSelected,isOpen,se
           showToast(false,'Concerned person not found.')
         }}
       
-        const onRespond = async () => {
+  const onRespond = async () => {
           if (!selected) {
             showToast(false, "Ticket not found");
             return;
@@ -94,9 +94,9 @@ export default function Modal({popupClassName='', selected,setSelected,isOpen,se
             setAdminResMsg('')
             setAdminResTitle("Ticket Issue Resolved.");
             setErrors({
-    adminResMsg: "",
-    adminResTitle: "",
-  })
+                adminResMsg: "",
+                adminResTitle: "",
+            })
             showToast(true, "Response submitted successfully.");
             onCancel();
 
@@ -106,7 +106,7 @@ export default function Modal({popupClassName='', selected,setSelected,isOpen,se
           } finally {
             setSubmitting(false);
           }
-        };
+    };
 
 
   useEffect(()=>{

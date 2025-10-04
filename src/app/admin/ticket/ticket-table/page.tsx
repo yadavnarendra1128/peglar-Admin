@@ -85,7 +85,7 @@ export default function Page(){
         header: "Resolved",
         size: 100,
         Cell: ({ row }) =>
-          row.original.status ? (
+          !row.original.status ? (
             <span
               title="Resolved"
               style={{

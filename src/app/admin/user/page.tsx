@@ -112,28 +112,46 @@ export default function UserTable() {
       },
       { accessorKey: "name", header: "Name", size: 150 },
       {
-        accessorKey: "email",
-        header: "Email Address",
-        size: 260,
-        Cell: ({ cell }) => cell.getValue<string>() || "-", // display dash if empty
-      },
+  accessorKey: "email",
+  header: "Email Address",
+  size: 220,
+  Cell: ({ cell }) => {
+    const value = cell.getValue<string>() || "-";
+    return (
+      <div
+        className="truncate max-w-[220px]" 
+        title={value} 
+      >
+        {value}
+      </div>
+    );
+  },
+},
       {
         accessorKey: "phone",
         header: "Mobile No",
-        size: 180,
+        size: 140,
         Cell: ({ cell }) => cell.getValue<string>() || "-",
       },
       {
+        accessorKey: "wallet_balance",
+        header: "Wallet",
+        size: 100,
+        enableSorting: true,
+        Cell: ({ cell }) => cell.getValue<string>() || "0",
+      },
+      {
         accessorKey: "createdAt",
-        header: "Created At",
+        header: "Created",
         size: 160,
         Cell: ({ cell }) => formatDateTime(cell.getValue<string>()),
       },
     ...(selected === "carpenter"
     ? [
         {
-          accessorKey: "Verified",
+          accessorKey: "isVerified",
           header: "Verified",
+          enableSorting: true,
           size: 100,
           Cell: ({ row }) => (
             row.original.isVerified ? (
