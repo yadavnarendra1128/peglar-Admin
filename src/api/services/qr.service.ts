@@ -48,9 +48,10 @@ export const generateBulkQRCodes = async (
   console.log(res.data, "QR codes data");
   return res.data;
 };
-export const getAllProductQr = async () => {
-  const res = await apiClient.get("/productQr/getAllQr");
-  return res.data.data;
+
+export const getAllProductQr = async (page = 1, limit = 10) => {
+  const res = await apiClient.get(`/productQr/getAllQr?page=${page}&limit=${limit}`);
+  return {total:res.data.length,data:res.data.data};
 };
 
 export const updateQrReward = async (payload:any) => {

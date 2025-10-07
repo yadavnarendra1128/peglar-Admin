@@ -118,7 +118,7 @@ export const getUserById = async (id:string): Promise<User> => {
 
 export const deleteUser = async (id:string)=>{
   try{
-    await apiClient.delete(`/users/${id}`)
+    await apiClient.delete(`/users/delete/${id}`)
   }catch(e:any){
     console.log(e);
     throw new Error(e.message)

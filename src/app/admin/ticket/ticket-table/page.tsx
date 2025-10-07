@@ -36,7 +36,7 @@ export default function Page(){
 
   const [page, setPage] = useState(1); 
   const [totalPages, setTotalPages] = useState(1); 
-  const limit = 10; 
+  const limit = 100; 
 
   const handleTicket = (row: MRT_Row<QrTicketType>) => {
     const ticket = row.original;

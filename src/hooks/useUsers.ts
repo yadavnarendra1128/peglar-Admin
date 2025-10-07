@@ -39,10 +39,10 @@ export const useDealers= () => {
 export const useCreateSubcategory = () => {
   const qc = useQueryClient();
 
-  return useMutation<Subcategory, Error, CreateSubcategoryDto>({
+  return useMutation<{status:'success' | 'error',message:string,data:Subcategory}, Error, CreateSubcategoryDto>({
     mutationFn: createSubcategory,
     onSuccess: () => {
-      // Invalidate any list queries so newly created item reflects
+      
       qc.invalidateQueries({ queryKey: ["subcategories"] });
     },
   });

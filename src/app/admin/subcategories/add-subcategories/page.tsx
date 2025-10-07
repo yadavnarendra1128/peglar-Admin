@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel,
   CircularProgress,
 } from "@mui/material";
 import { useCategories } from "@/hooks/useCategories";
@@ -47,16 +46,20 @@ export default function Page() {
     }
 
     try {
-      await mutateAsync({
+     const res = await mutateAsync({
         name: formData.name.trim(),
         categoryId: formData.categoryId.trim(), // selected category id
       });
-
+      if(res.status=="error"){
+        setErrorMsg(res.message);
+        showToast(false, "Failed to create subcategory");
+      }else{
       setSuccessMsg("Subcategory created successfully");
       showToast(true, "Subcategory created successfully");
       setFormData({ name: "", categoryId: "" });
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Failed to create subcategory");
+    }}catch (err: any) {
+      console.log(err)
+      setErrorMsg("Failed to create subcategory");
       showToast(false, "Failed to create subcategory");
     }
   };
@@ -78,7 +81,12 @@ export default function Page() {
                   type="text"
                   placeholder="e.g., Quantum Physics"
                   value={formData.name}
-                  onChange={(value: any) => handleChange("name", value)}
+                  onChange={(value: any) => {
+                    if (errorMsg) {
+                      setErrorMsg("");
+                    }
+                    return handleChange("name", value);
+                  }}
                   customClasses="mb-4.5"
                   required
                 />
@@ -93,14 +101,27 @@ export default function Page() {
                   <p className="text-red mb-4.5">Failed to load categories</p>
                 ) : (
                   <FormControl fullWidth className="mb-4.5">
-                    <InputLabel id="category-label">Select Category</InputLabel>
                     <Select
-                      labelId="category-label"
                       value={formData.categoryId}
-                      onChange={(e) =>
-                        handleChange("categoryId", e.target.value)
-                      }
+                      onChange={(e) => {
+                        if (errorMsg) setErrorMsg("");
+                        handleChange("categoryId", e.target.value);
+                      }}
+                      displayEmpty
                       required
+                      renderValue={(selected) => {
+                        if (!selected) {
+                          return (
+                            <span className="text-gray-400">
+                              Select Category
+                            </span>
+                          );
+                        }
+                        const selectedCat = categories ? categories.find(
+                          (c) => c.id === selected
+                        ) : undefined;
+                        return selectedCat?.name || "";
+                      }}
                     >
                       {categories?.map((cat: any) => (
                         <MenuItem key={cat.id} value={cat.id}>

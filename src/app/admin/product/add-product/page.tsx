@@ -23,6 +23,8 @@ type errorDataType = {
   name: string;
   model_no: string;
   base_price: string;
+  dummy_price: string;
+  material:string;
   description: string;
   finish: string;
   categoryId: string;
@@ -55,8 +57,8 @@ export default function AddProductPage() {
     name: "",
     model_no: "",
     description:"",
-    finish: "",
-    base_price:0,
+    finish: "",material:"",
+    base_price:0,dummy_price:0,
     categoryId: "",
     subcategoryId: "",
     media:[]
@@ -75,7 +77,7 @@ export default function AddProductPage() {
   const [errors, setErrors] = useState<errorDataType>({
   name: "",
   model_no: "",
-  base_price: "",
+  base_price: "",dummy_price:"",material:"",
   description: "",
   finish: "",
   categoryId: "",
@@ -87,10 +89,12 @@ export default function AddProductPage() {
   };
 
   const isValid = () => {
-    const newErrors: errorDataType =  {
+    const newErrors: errorDataType = {
       name: "",
       model_no: "",
       base_price: "",
+      dummy_price: "",
+      material: "",
       description: "",
       finish: "",
       categoryId: "",
@@ -98,49 +102,64 @@ export default function AddProductPage() {
       media: "",
     };
 
-  if (!formData.name?.trim()) {
-    newErrors.name = "Name is required";
-  }
+    if (!formData.name?.trim()) {
+      newErrors.name = "Name is required";
+    }
 
-  // Model number
-  if (!formData.model_no?.trim()) {
-    newErrors.model_no = "Model number is required";
-  }
+    // Model number
+    if (!formData.model_no?.trim()) {
+      newErrors.model_no = "Model number is required";
+    }
 
-  // Base price
-  if (!formData.base_price) {
-    newErrors.base_price = "Base price is required";
-  } else if (
-    isNaN(Number(formData.base_price)) ||
-    Number(formData.base_price) <= 0
-  ) {
-    newErrors.base_price = "Enter a valid price";
-  }
+    // Base price
+    if (!formData.base_price) {
+      newErrors.base_price = "Base price is required";
+    } else if (
+      isNaN(Number(formData.base_price)) ||
+      Number(formData.base_price) <= 0
+    ) {
+      newErrors.base_price = "Enter a valid price";
+    }
 
-  // Description
-  if (!formData.description?.trim()) {
-    newErrors.description = "Description is required";
-  }
+    // Base price
+    if (!formData.dummy_price) {
+      newErrors.dummy_price = "Dummy price is required";
+    } else if (
+      isNaN(Number(formData.dummy_price)) ||
+      Number(formData.dummy_price) <= 0
+    ) {
+      newErrors.dummy_price = "Enter a valid dummy price";
+    }
 
-  // finish
-  if (!formData.finish?.trim()) {
-    newErrors.finish = "Finish is required";
-  } 
+    // Description
+    if (!formData.description?.trim()) {
+      newErrors.description = "Description is required";
+    }
 
-  // Category
-  if (!formData.categoryId?.trim()) {
-    newErrors.categoryId = "Category is required";
-  }
+    // Material
+    if (!formData.material?.trim()) {
+      newErrors.material = "Material is required";
+    }
 
-  // Subcategory
-  if (!formData.subcategoryId?.trim()) {
-    newErrors.subcategoryId = "Subcategory is required";
-  }
+    // finish
+    if (!formData.finish?.trim()) {
+      newErrors.finish = "Finish is required";
+    }
 
-  // Media
-  if (!formData.media || formData.media.length === 0) {
-    newErrors.media = "At least one media file is required";
-  }
+    // Category
+    if (!formData.categoryId?.trim()) {
+      newErrors.categoryId = "Category is required";
+    }
+
+    // Subcategory
+    if (!formData.subcategoryId?.trim()) {
+      newErrors.subcategoryId = "Subcategory is required";
+    }
+
+    // Media
+    if (!formData.media || formData.media.length === 0) {
+      newErrors.media = "At least one media file is required";
+    }
 
     setErrors(newErrors);
     return Object.values(newErrors).every((v) => v === "");
@@ -156,6 +175,7 @@ export default function AddProductPage() {
           name: res.name,
           model_no: res.model_no,
           base_price:res.base_price,
+          dummy_price:res.dummy_price,material:res.material,
           description: res.description,
           finish: res.finish || 1,
           categoryId: res.Category.id,
@@ -382,7 +402,7 @@ export default function AddProductPage() {
                  model_no: "",
                  description: "",
                  finish: "",
-                 base_price: 0,
+                 base_price: 0,dummy_price:0,material:"",
                  media: [],
                  categoryId: "",
                  subcategoryId: "",
@@ -469,13 +489,24 @@ export default function AddProductPage() {
                   error={errors.description}
                 />
 
+                {/* Material */}
+                <InputGroup
+                  label="Material"
+                  type="text"
+                  placeholder="Enter Material"
+                  value={formData.material}
+                  onChange={(value) => handleChange("material", value)}
+                  customClasses="mb-4.5"
+                  error={errors.material}
+                />
+
                 {/* QR Count */}
                 <InputGroup
                   label="Finish"
                   type="text"
                   placeholder="Enter Finish"
                   value={formData.finish}
-                  onChange={(value) => handleChange("finish", (value))}
+                  onChange={(value) => handleChange("finish", value)}
                   customClasses="mb-4.5"
                   error={errors.finish}
                 />
@@ -491,6 +522,19 @@ export default function AddProductPage() {
                   }
                   customClasses="mb-4.5"
                   error={errors.base_price}
+                />
+
+                {/* Base price */}
+                <InputGroup
+                  label="Dummy Price"
+                  type="number"
+                  placeholder="Enter dummy price"
+                  value={formData.dummy_price}
+                  onChange={(value) =>
+                    handleChange("dummy_price", Number(value))
+                  }
+                  customClasses="mb-4.5"
+                  error={errors.dummy_price}
                 />
 
                 {/* Category Dropdown */}
@@ -522,7 +566,9 @@ export default function AddProductPage() {
         <div className="relative my-4 p-4 rounded-[10px] border border-stroke bg-white shadow-md">
           <div className="text-lg">Product Media</div>
           {errors.media && (
-            <p className="text-red-400  my-1 text-sm font-medium">{errors.media}</p>
+            <p className="text-red-400  my-1 text-sm font-medium">
+              {errors.media}
+            </p>
           )}
           <div className="flex flex-row items-center justify-start mb-4 gap-6">
             {/* upload button */}
@@ -634,7 +680,7 @@ export default function AddProductPage() {
             </div>
           )}
 
-          {(
+          {
             <>
               <button
                 type="button"
@@ -677,7 +723,7 @@ export default function AddProductPage() {
                 </svg>
               </button>
             </>
-          )}
+          }
         </div>
 
         <button

@@ -32,6 +32,8 @@ export type ProductType = {
   name: string;
   model_no: string;
   base_price:number;
+  dummy_price:number;
+  material:string;
   finish: string;
   description:string;
   categoryId: string;
@@ -153,7 +155,7 @@ export const updateUser = async (id: string,payload:any) => {
 
 export const deleteUser = async (id:string)=>{
   try{
-    await apiClient.delete(`/users/${id}`)
+    await apiClient.delete(`/users/delete/${id}`)
   }catch(e:any){
     console.log(e);
     throw new Error(e.message)
@@ -235,10 +237,10 @@ export type Subcategory = {
 };
 
 export const createSubcategory = async (
-  payload: CreateSubcategoryDto
-): Promise<Subcategory> => {
+  payload:CreateSubcategoryDto
+): Promise<{status:'success'|'error',message:string,data:Subcategory}> => {
   const res = await apiClient.post("/subcategories", payload);
-  return res.data;
+  return res.data
 };
 
 // QR Code Generation Types and API

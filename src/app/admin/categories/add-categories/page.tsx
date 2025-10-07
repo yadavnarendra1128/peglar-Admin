@@ -12,9 +12,8 @@ export default function Page() {
   const [formData, setFormData] = useState({
     name: "",
   });
-
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isError, setError] = useState(false);
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -23,21 +22,27 @@ export default function Page() {
     e.preventDefault();
     setLoading(true);
     if (!formData.name) {
-      setError(true);
+      setErrorMsg('Category Name is required')
       setLoading(false);
       return;
     }
-    setError(false);
+    setErrorMsg('');
     await createMutation.mutateAsync(formData.name);
     setLoading(false);
   };
-  const createMutation = useMutation({
-    mutationFn: (name: string) => createCategory(name),
-    onSuccess: () => {
+    const createMutation = useMutation({
+  mutationFn: (name: string) => createCategory(name),
+  onSuccess: (res: { status: 'success' | 'error'; message: string  }) => {
+    if (res.status === "error") {
+      showToast(false, res.message);
+      setErrorMsg(res.message)
+    } else {
       setFormData({ name: "" });
-      showToast(true, "category created successfully");
-    },
+      showToast(true, res.message || "Category created successfully");
+    }
+  },
     onError: (err) => {
+       setErrorMsg("failed to create category.");
       showToast(false, "failed to create category try again");
       console.error("Error creating category:", err);
     },
@@ -62,12 +67,18 @@ export default function Page() {
                   type="text"
                   placeholder="Enter Category Name"
                   value={formData.name}
-                  onChange={(value) => handleChange("name", value)}
+                  onChange={(value) => {
+                    if (errorMsg) {
+                      setErrorMsg("");
+                    }
+                    return handleChange("name", value);
+                  }}
                   customClasses="mb-4.5"
                   required
-                  error={isError ? "name field required" : ""}
+                  error={errorMsg ? errorMsg : ""}
                 />
               </div>
+              
             </div>
           </div>
         </div>
