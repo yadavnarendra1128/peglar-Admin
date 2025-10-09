@@ -18,7 +18,7 @@ type QrCode = {
 export default function PaginationTestPage() {
   const [pagination, setPagination] = useState<MRT_PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   // Fetch paginated data
@@ -46,24 +46,58 @@ export default function PaginationTestPage() {
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Pagination Test" />
-      <MaterialReactTable
-        columns={columns}
-        data={qrData}
-        manualPagination // enables backend pagination mode
-        onPaginationChange={setPagination} // updates pagination state
-        state={{
-          pagination,
-          isLoading,
-        }}
-        rowCount={data?.total || 0} // total rows from backend
-        enableBottomToolbar // shows bottom pagination
-        enablePagination // ensures pagination UI is visible
-        muiTablePaginationProps={{
-          rowsPerPageOptions: [10, 20, 50, 100], // user can change page size
-          showFirstButton: true,
-          showLastButton: true,
-        }}
-      />
+     <MaterialReactTable
+  columns={columns}
+  data={qrData}
+  manualPagination
+  onPaginationChange={setPagination}
+  state={{
+    pagination,
+    isLoading,
+  }}
+  rowCount={data?.total || 0}
+  enableBottomToolbar
+  enablePagination={false} // hides default pagination
+  renderBottomToolbarCustomActions={() => (
+    <div className="flex gap-2 items-center">
+      <button
+        className="px-3 py-1 border rounded disabled:opacity-50"
+        onClick={() =>
+          setPagination((prev) => ({
+            ...prev,
+            pageIndex: Math.max(prev.pageIndex - 1, 0),
+          }))
+        }
+        disabled={pagination.pageIndex === 0}
+      >
+        Prev
+      </button>
+      <span>
+        Page {pagination.pageIndex + 1} of{" "}
+        {Math.ceil((data?.total || 0) / pagination.pageSize)}
+      </span>
+      <button
+        className="px-3 py-1 border rounded disabled:opacity-50"
+        onClick={() =>
+          setPagination((prev) => ({
+            ...prev,
+            pageIndex: Math.min(
+              prev.pageIndex + 1,
+              Math.ceil((data?.total || 0) / prev.pageSize) - 1
+            ),
+          }))
+        }
+        disabled={
+          pagination.pageIndex + 1 >=
+          Math.ceil((data?.total || 0) / pagination.pageSize)
+        }
+      >
+        Next
+      </button>
+    </div>
+  )}
+/>
+
     </DefaultLayout>
   );
 }

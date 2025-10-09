@@ -151,8 +151,6 @@ export default function SubcategoriesPage() {
           return row.original.subcategoryName;
         },
       },
-      // { accessorKey: "categoryId", header: "Category ID", size: 260 },
-      // { accessorKey: "subcategoryId", header: "Subcategory ID", size: 260 },
       {
         accessorKey: "updatedAt",
         header: "Updated At",

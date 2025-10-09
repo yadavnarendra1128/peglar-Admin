@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import React, { Suspense, useEffect, useMemo, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { getVariantsByProductId } from '@/api/services/base.service'
 import showToast from '@/api/lib/showToast'
 import DefaultLayout from '@/components/Admin/Layouts/DefaultLaout'
@@ -13,7 +13,8 @@ import {
 } from "material-react-table";
 import { Box,Typography } from '@mui/material'
 import { handleProductVariants, VariantType } from '@/api/services/product.service'
-
+import DeleteModal from '@/components/Admin/ConfirmDeleteModal/ConfirmDeleteModal'
+import { useDeleteModal } from "@/context/DeleteModalContext";
 export default function page() {
 
   return (
@@ -40,7 +41,7 @@ const VariantComponent = ()=>{
     const [loading,setLoading]=useState<boolean>(true)
     const [localError,setLocalError]=useState<string>('')
     const [variantsUpdated,setVariantsUpdated]=useState<boolean>(false)
-
+  const { item, isOpen, openModal, closeModal } = useDeleteModal();
     const [errors, setErrors] = useState<errorDataType>({
       size: "",
       finish: "",
@@ -166,16 +167,17 @@ const VariantComponent = ()=>{
         setUpdatingEntry(index)
     }
 
-    const handleDelete = (row: MRT_Row<VariantType>,index:number) => {
+    const onConfirmDelete = (row: MRT_Row<VariantType>,index:number) => {
       if(!variantsUpdated){setVariantsUpdated(true)}
       setVariants((prev)=>prev.filter((v,i)=>i!==index))
+      showToast(true, "Please submit to apply your changes.");
     };
 
     const handleVariantsApi = async()=>{
       try{
         setSubmitting(true)
         await handleProductVariants(productId ?? '',variants)
-        showToast(true,'Success.')
+        showToast(true,'Variants updated successfully.')
       }catch(err){
         showToast(false,'Error handling variants: ',err)
       }finally{
@@ -254,7 +256,7 @@ const VariantComponent = ()=>{
                  Edit
                </button>
                <button
-                 onClick={() => handleDelete(row,row.index)}
+                 onClick={() => onConfirmDelete(row,row.index)}
                  title="Delete Variant"
                  style={{
                    background: "#ff4d4d",

@@ -73,6 +73,10 @@ export type BackendUser = {
   userType: "customer" | "dealer" | "carpenter" | "admin";
   aadhar?: { aadharNumber: string; aadharImage: string };
   panDetail?: { panNumber: string; pamImage: string };
+  upiDetails: {
+    upiId:string;
+    isUpiVerified:boolean
+  };
   isVerified: boolean;
   lifetime_earning: string;
   createdAt: string;

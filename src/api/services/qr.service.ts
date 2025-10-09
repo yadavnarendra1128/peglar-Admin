@@ -50,8 +50,9 @@ export const generateBulkQRCodes = async (
 };
 
 export const getAllProductQr = async (page = 1, limit = 10) => {
+  console.log(page,limit)
   const res = await apiClient.get(`/productQr/getAllQr?page=${page}&limit=${limit}`);
-  return {total:res.data.length,data:res.data.data};
+  return {total:res.data.total,data:res.data.data};
 };
 
 export const updateQrReward = async (payload:any) => {

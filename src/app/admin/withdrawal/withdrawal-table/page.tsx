@@ -33,7 +33,8 @@ type Withdrawal = {
 
 export default function WithdrawalTable() {
   const { item, isOpen, openModal, closeModal } = useDeleteModal();
-
+  // Normalize data structure
+  const [tableData, setTableData] = useState<Withdrawal[]>([]);
   const onConfirmDelete = async () => {
     try {
       // await deleteUser(item.id)
@@ -48,8 +49,8 @@ export default function WithdrawalTable() {
   };
   const [mounted, setMounted] = useState(false);
 
-   const { data, isLoading, error } = useWithdrawals();
-   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const { data, isLoading, error } = useWithdrawals();
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // Prevent hydration issues
   useEffect(() => setMounted(true), []);
@@ -229,11 +230,8 @@ export default function WithdrawalTable() {
         ),
       },
     ],
-    []
+    [tableData]
   );
-
-  // Normalize data structure
-  const [tableData, setTableData] = useState<Withdrawal[]>([]);
 
   useEffect(() => {
     console.log("AALLLL", data);
@@ -241,8 +239,6 @@ export default function WithdrawalTable() {
       setTableData(data);
     }
   }, [data]);
-
-  //payment api call
 
   const payment = async (payload: Withdrawal) => {
     setIsPaymentLoading(true);
@@ -252,6 +248,11 @@ export default function WithdrawalTable() {
     try {
       await sendPayment(userId, upiId, parseInt(amount));
       showToast(true, "Payment done successfully!!!");
+      setTableData((prev) =>
+        prev.map((item) =>
+          item.id === payload.id ? { ...item, status: "approved" } : item
+        )
+      );
     } catch (e: any) {
       showToast(false, e.message);
     } finally {
