@@ -84,6 +84,7 @@ export default function AddProductPage() {
   subcategoryId: "",
   media: "",
 })
+
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };

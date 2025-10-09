@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { Suspense,  useEffect, useMemo, useState } from 'react'
 import { getVariantsByProductId } from '@/api/services/base.service'
 import showToast from '@/api/lib/showToast'
 import DefaultLayout from '@/components/Admin/Layouts/DefaultLaout'
@@ -187,7 +187,6 @@ const VariantComponent = ()=>{
 
     const handleSubmit=(e:any)=>{
       e.preventDefault();
-      if(variants.length!==0){
         if(productId && variantsUpdated){
           handleVariantsApi()
         }else if(!variantsUpdated){
@@ -195,10 +194,7 @@ const VariantComponent = ()=>{
         }else{
           showToast(false,'Product not found.')
         }
-      }else{
-        showToast(false,"Variants not found.")
       }
-    }
 
     useEffect(()=>{
         const getVariantsforProduct = async()=>{
@@ -420,7 +416,7 @@ const VariantComponent = ()=>{
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={submitting || variants.length==0}
+            disabled={submitting}
             className="mt-6 w-full rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 transition hover:bg-hoverPrimary hover:cursor-pointer disabled:bg-primary/50 disabled:cursor-not-allowed"
           >
             Submit          
